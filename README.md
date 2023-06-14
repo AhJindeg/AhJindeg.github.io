@@ -1,1 +1,1 @@
-# AhJindeg.me
+# https://AhJindeg.github.io
