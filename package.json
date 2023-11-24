@@ -1,0 +1,17 @@
+{
+  "name": "AhJindeg.github.io",
+  "version": "2.0.0",
+  "description": "Demo for vuepress-theme-reco@2.x.",
+  "repository": "https://github.com/AhJindeg/AhJindeg.github.io.git",
+  "author": "AhJindeg <AhJindeg@163.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vuepress dev .",
+    "start": "vuepress dev .",
+    "build": "vuepress build ."
+  },
+  "dependencies": {
+    "vuepress": "2.0.0-rc.0",
+    "vuepress-theme-reco": "2.0.0-rc.1"
+  }
+}
