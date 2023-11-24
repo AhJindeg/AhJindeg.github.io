@@ -3,7 +3,7 @@ import type { DefaultThemeOptions } from 'vuepress'
 import recoTheme from 'vuepress-theme-reco'
 
 export default defineUserConfig({
-  title: 'AhJindeg AJ. W.',
+  title: 'AhJindeg\'s Blog',
   description: '',
   theme: recoTheme({
     style: '@vuepress-reco/style-default',
