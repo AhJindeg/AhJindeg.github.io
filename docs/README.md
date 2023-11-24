@@ -9,7 +9,7 @@ bannerBrand:
   bgImage: '/bg.svg'
   title: Arthur AJ. W.
   description:
-  tagline:
+  tagline: 人生必有痴，而后有成。痴各不同，各行其是，皆无不可。
   buttons:
     # - { text: '', link: '/docs/guide/introduce' }
     # - { text: '', link: '', type: 'plain' }
