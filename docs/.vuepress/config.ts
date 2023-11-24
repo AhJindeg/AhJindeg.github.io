@@ -1,9 +1,8 @@
 import { defineUserConfig } from 'vuepress'
-import type { DefaultThemeOptions } from 'vuepress'
 import recoTheme from 'vuepress-theme-reco'
 
 export default defineUserConfig({
-  title: 'AhJindeg\'s Blog',
+  title: "AhJindeg's Blog",
   description: '',
   theme: recoTheme({
     style: '@vuepress-reco/style-default',
@@ -15,7 +14,18 @@ export default defineUserConfig({
     docsDir: 'example',
     lastUpdatedText: '',
     editLink: false,
-    // series 为原 sidebar
+    navbar: [
+      { text: 'Home', link: '/' },
+      { text: 'Categories', link: '/categories/category1/1/' },
+      { text: 'Tags', link: '/tags/tag1/1/' },
+      {
+        text: 'Docs',
+        children: [
+          { text: 'vuepress-reco', link: '/docs/theme-reco/home' },
+          { text: 'vuepress-theme-reco', link: '/blogs/other/guide' },
+        ],
+      },
+    ],
     series: {
       '/docs/theme-reco/': [
         {
@@ -28,18 +38,6 @@ export default defineUserConfig({
         },
       ],
     },
-    navbar: [
-      { text: 'Home', link: '/' },
-      { text: 'Categories', link: '/categories/reco/1/' },
-      { text: 'Tags', link: '/tags/tag1/1/' },
-      {
-        text: 'Docs',
-        children: [
-          { text: 'vuepress-reco', link: '/docs/theme-reco/theme' },
-          { text: 'vuepress-theme-reco', link: '/blogs/other/guide' },
-        ],
-      },
-    ],
   }),
   // debug: true,
 })
