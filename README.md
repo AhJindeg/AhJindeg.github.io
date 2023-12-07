@@ -24,7 +24,7 @@ blog:
     - { icon: 'LogoGithub', link: 'https://github.com/AhJindeg' }
     - { icon: 'LogoTwitter', link: 'https://twitter.com/AhJindeg' }
     - { icon: 'Book', link: 'https://juejin.cn/user/1042780737252231/posts' }
-    - { icon: 'Email', link: 'mailto: AhJindeg@163.com' }
+    - { icon: 'Email', link: 'mailto: AhJindeg@gmail.com' }
 isShowTitleInHome: true
 # actionText: About
 # actionLink: /views/other/about
