@@ -25,7 +25,7 @@ export default defineUserConfig({
           { text: '首页', link: '/' },
           { text: '时间轴', link: '/timeline' },
           { text: '博客列表', link: '/posts' },
-          { text: '友情链接', link: '/friendship-link' },
+          // { text: '友情链接', link: '/friendship-link' },
           {
             text: 'reco-docs',
             children: [
@@ -55,9 +55,9 @@ export default defineUserConfig({
           { text: 'Vue', link: '/categories/vue/vue3/1/' },
         ],
       },
-      { text: '框架文档', link: '/docs/frame-document/' },
-      { text: '英文学习', link: '/docs/english-learning/' },
-      { text: '拳击训练', link: '/docs/boxing-training/' },
+      // { text: '框架文档', link: '/docs/frame-document/' },
+      // { text: '英文学习', link: '/docs/english-learning/' },
+      // { text: '拳击训练', link: '/docs/boxing-training/' },
     ],
     series: {
       '/docs/theme-reco/': [
