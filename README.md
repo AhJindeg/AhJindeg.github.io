@@ -13,14 +13,14 @@ bannerBrand:
   buttons:
     # - { text: '', link: '', type: 'plain' }
   socialLinks:
-    - { icon: 'LogoDiscord', link: '/' }
+    - { icon: 'LogoDiscord', link: 'https://discord.gg/jgY4AKWkpF' }
     - { icon: 'LogoGithub', link: 'https://github.com/AhJindeg' }
     - { icon: 'LogoTwitter', link: 'https://twitter.com/AhJindeg' }
     - { icon: 'Book', link: 'https://juejin.cn/user/1042780737252231/posts' }
-    - { icon: 'Email', link: 'mailto: AhJindeg@163.com' }
+    - { icon: 'Email', link: 'mailto: AhJindeg@gmail.com' }
 blog:
   socialLinks:
-    - { icon: 'LogoDiscord', link: '/' }
+    - { icon: 'LogoDiscord', link: 'https://discord.gg/jgY4AKWkpF' }
     - { icon: 'LogoGithub', link: 'https://github.com/AhJindeg' }
     - { icon: 'LogoTwitter', link: 'https://twitter.com/AhJindeg' }
     - { icon: 'Book', link: 'https://juejin.cn/user/1042780737252231/posts' }
