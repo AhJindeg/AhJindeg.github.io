@@ -6,7 +6,7 @@ modules:
   - MdContent
   - Footer
 bannerBrand:
-  bgImage: '/bg.svg'
+  bgImage: '/bg.jpg'
   title: Arthur AJ. W.
   description:
   tagline: 人生必有痴，而后有成。痴各不同，各行其是，皆无不可。
