@@ -1,6 +1,6 @@
 import recoTheme from 'vuepress-theme-reco'
-import navbar from './navbar/index.ts'
-import series from './series/index.ts'
+import navbar from './navbar'
+import series from './series'
 
 export const theme = recoTheme({
   style: '@vuepress-reco/style-default',

@@ -1,3 +1,5 @@
-import { series } from './data'
+import LinkConfig from "../linkConfig";
 
-export default { ...series }
+export default {
+  ...LinkConfig.VuepressReco.series,
+}
