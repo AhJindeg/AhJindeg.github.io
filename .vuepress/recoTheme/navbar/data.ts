@@ -59,6 +59,6 @@ export const navbar = [
     ],
   },
   { text: '框架文档', link: '/docs/frame-document/' },
-  { text: '英文学习', link: '/docs/english-learning/' },
-  { text: '拳击训练', link: '/docs/boxing-training/' },
+  // { text: '英文学习', link: '/docs/english-learning/' },
+  // { text: '拳击训练', link: '/docs/boxing-training/' },
 ]
