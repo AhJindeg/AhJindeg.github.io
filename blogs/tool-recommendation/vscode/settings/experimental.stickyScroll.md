@@ -2,7 +2,7 @@
 title: 顶部浮动显示当前层级
 date: 2023/11/27
 tags:
-  - vscode/config
+  - vscode/settings
 ---
 
 新版 VScode 属性，翻滚时可以在顶部浮动显示当前层级

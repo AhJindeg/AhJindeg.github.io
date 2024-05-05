@@ -2,7 +2,7 @@
 title: VScode 配置深拷贝代码片段
 date: 2023/11/27
 tags:
-  - vscode/config
+  - vscode/code-snippets
 ---
 
 日常进行深拷贝时我们会使用`JSON.parse(JSON.stringify(data))`进行 copy

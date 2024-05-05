@@ -2,7 +2,7 @@
 title: 关于 JSON 序列化与反序列化那些事
 date: 2023/11/27
 categories:
-  - javascript
+  - javascript/json
 ---
 
 ## 1. JSON.stringify：`格式化`

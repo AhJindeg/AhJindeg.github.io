@@ -2,7 +2,7 @@
 title: 驼峰翻译助手
 date: 2023/11/27
 tags:
-  - vscode/plugin
+  - vscode/extensions
 ---
 
 ## 插件地址：[驼峰翻译助手](https://marketplace.visualstudio.com/items?itemName=svenzhao.var-translation)

@@ -2,7 +2,7 @@
 title: git-commit-plugin
 date: 2023/11/27
 tags:
-  - vscode/plugin
+  - vscode/extensions
 ---
 
 ## 分享一款自己平时进行 Git 提交时的插件

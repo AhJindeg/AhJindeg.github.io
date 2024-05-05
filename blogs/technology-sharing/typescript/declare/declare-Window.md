@@ -2,7 +2,7 @@
 title: 给 Window 增加自定义属性声明
 date: 2023/11/27
 categories:
-  - typescript
+  - typescript/declare
 ---
 
 ## 给 Window 增加一个简单的类型声明

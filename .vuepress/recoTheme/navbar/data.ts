@@ -22,8 +22,9 @@ export const navbar = [
       {
         text: 'VScode',
         children: [
-          { text: '配置', link: '/tags/vscode/config/1/' },
-          { text: '插件', link: '/tags/vscode/plugin/1/' },
+          { text: '设置', link: '/tags/vscode/settings/1/' },
+          { text: '扩展', link: '/tags/vscode/extensions/1/' },
+          { text: '代码片段', link: '/tags/vscode/code-snippets/1/' },
         ],
       },
     ],
@@ -31,9 +32,30 @@ export const navbar = [
   {
     text: '技术分享',
     children: [
-      { text: 'JavaScript', link: '/categories/javascript/1/' },
-      { text: 'TypeScript', link: '/categories/typescript/1/' },
-      { text: 'Vue', link: '/categories/vue/vue3/1/' },
+      {
+        text: 'JavaScript', children: [
+          {
+            text: 'JSON', link: '/categories/javascript/json/1/'
+          }
+        ]
+      },
+      {
+        text: 'TypeScript', children: [
+          {
+            text: 'declare', link: '/categories/typescript/declare/1/',
+          }
+        ]
+      },
+      {
+        text: 'Vue', children: [
+          {
+            text: 'vue3', link: '/categories/vue/vue3/1/',
+          },
+          {
+            text: 'vue-router', link: '/categories/vue/vue-router/1/',
+          },
+        ]
+      },
     ],
   },
   { text: '框架文档', link: '/docs/frame-document/' },
