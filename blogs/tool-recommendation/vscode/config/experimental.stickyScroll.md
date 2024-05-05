@@ -11,4 +11,4 @@ tags:
 "editor.experimental.stickyScroll.enabled":true,
 ```
 
-![AhJindeg-1701076874210](md-images/顶部浮动显示当前层级/AhJindeg-1701076874210.png)
+![AhJindeg-1701076874210](md-images/experimental.stickyScroll/AhJindeg-1701076874210.png)

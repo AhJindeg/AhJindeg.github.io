@@ -13,8 +13,8 @@ tags:
 
 开启
 
-![AhJindeg-1701156705523](md-images/防止空文件夹压缩/AhJindeg-1701156705523.png)
+![AhJindeg-1701156705523](md-images/compactFolders/AhJindeg-1701156705523.png)
 
 关闭
 
-![AhJindeg-1701156684507](md-images/防止空文件夹压缩/AhJindeg-1701156684507.png)
+![AhJindeg-1701156684507](md-images/compactFolders/AhJindeg-1701156684507.png)
