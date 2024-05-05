@@ -1,5 +1,5 @@
 ---
-title: VScode 配置深拷贝代码片段
+title: VScode 配置 深拷贝 代码片段
 date: 2023/11/27
 tags:
   - vscode/code-snippets
@@ -10,8 +10,6 @@ tags:
 但是对象内有函数，或者是数据过于复杂非扁平化就会出现数据丢失的问题
 <br />
 使用下面这个可以应对绝大多数需要深拷贝的场景
-<br />
-可直接放入 VScode 用户代码片段使用
 
 ```json
 {
