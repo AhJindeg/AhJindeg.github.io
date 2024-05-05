@@ -5,7 +5,7 @@ tags:
   - vscode/code-snippets
 ---
 
-日常进行深拷贝时我们会使用`JSON.parse(JSON.stringify(data))`进行 copy
+日常进行深拷贝时我们会使用 ***JSON.parse(JSON.stringify(data))*** 进行 copy
 <br />
 但是对象内有函数，或者是数据过于复杂非扁平化就会出现数据丢失的问题
 <br />
