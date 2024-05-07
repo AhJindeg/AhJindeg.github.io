@@ -1,4 +1,5 @@
 export default {
-  text: '拳击训练',
+  text: '训练',
+  icon: 'MachineLearningModel',
   link: '/docs/boxing-train/'
 }

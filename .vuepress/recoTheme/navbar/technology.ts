@@ -1,5 +1,6 @@
 export default {
   text: '技术分享',
+  icon: 'Code',
   children: [
     {
       text: 'JavaScript', children: [

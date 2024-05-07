@@ -1,5 +1,6 @@
 export default {
   text: '工具推荐',
+  icon: 'ToolKit',
   children: [
     {
       text: 'VScode',
