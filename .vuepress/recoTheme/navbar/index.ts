@@ -2,8 +2,6 @@ import UserBlogs from "./user-blogs";
 import Tools from "./tools";
 import Technology from "./technology";
 import Frame from "./frame";
-import EnglishLearn from "./english-learn";
-import BoxingTrain from "./boxing-train";
 
 export default [
   {
@@ -14,14 +12,12 @@ export default [
       { text: '博客列表', link: '/posts' },
     ],
   },
-  {
-    text: '时间轴', icon: 'Roadmap', link: '/timeline'
-  },
   UserBlogs,
   Tools,
   Technology,
   Frame,
-  EnglishLearn,
-  BoxingTrain,
+  {
+    text: '时间轴', icon: 'Roadmap', link: '/timeline'
+  },
   { text: '友情链接', icon: 'At', link: '/friendship-link' },
 ]
