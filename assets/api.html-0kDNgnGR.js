@@ -1,0 +1,1 @@
+const e=JSON.parse('{"key":"v-330bdccc","path":"/docs/vuepress-reco/api.html","title":"api","lang":"zh-CN","frontmatter":{"title":"api","date":"2020/05/29"},"headers":[],"git":{"createdTime":1715309656000,"updatedTime":1715309656000,"contributors":[{"name":"AhJindeg","email":"AhJindeg@gmail.com","commits":1}]},"filePathRelative":"docs/vuepress-reco/api.md"}');export{e as data};
