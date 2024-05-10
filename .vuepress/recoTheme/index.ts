@@ -4,7 +4,7 @@ import series from './series'
 
 export const theme = recoTheme({
   style: '@vuepress-reco/style-default',
-  colorMode: 'dark',
+  primaryColor: '#4d9375',
   author: 'AhJindeg',
   authorAvatar: '/head.png',
   home: '/',

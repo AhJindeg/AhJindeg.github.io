@@ -1,3 +1,11 @@
 .banner-brand__content > .tagline {
   color: #fff !important;
 }
+
+.navbar-container {
+  background-color: rgb(255 255 255 / 0.5) !important;
+}
+
+.dark .navbar-container {
+  background-color: rgb(22 22 23 / 0.6) !important;
+}
