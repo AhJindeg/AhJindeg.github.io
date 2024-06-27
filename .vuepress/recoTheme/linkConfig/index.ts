@@ -1,3 +1,3 @@
-import VuepressReco from "./vuepress-reco";
+import English from "./english"
 
-export default { VuepressReco }
+export default { English }

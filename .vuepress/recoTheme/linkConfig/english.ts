@@ -1,0 +1,26 @@
+export default {
+  navbar: {
+    text: '资源推荐',
+    link: '/docs/english/resources/all',
+  },
+  series: {
+    '/docs/english/resources/': [
+      {
+        text: '总览',
+        children: ['all'],
+      },
+      {
+        text: '网站',
+        children: [],
+      },
+      {
+        text: '工具',
+        children: [],
+      },
+      {
+        text: '文档',
+        children: ['most-common-american-idioms_xiaolai'],
+      },
+    ],
+  }
+}
