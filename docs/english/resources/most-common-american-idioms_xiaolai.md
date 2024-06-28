@@ -23,11 +23,11 @@ This phrase originates from the standard working hours, from 9 AM to 5 PM, which
 **例句**
 
 - <span lang="en">She works a typical *9-to-5* job at an office.</span> <span lang="cn">她在办公室做一份典型的朝九晚五的工作。</span>
-  <audio controls><source src="md-file/audio/most-common-american-idioms_xiaolai/001.1.mp3" type="audio/mpeg"></audio>
+  <audio controls><source src="https://ahjindeg.github.io/docs/english/resources/md-file/audio/most-common-american-idioms_xiaolai/001.1.mp3" type="audio/mpeg"></audio>
 - <span lang="en">I'm tired of the *9-to-5* grind and want a more flexible schedule.</span> <span lang="cn">我厌倦了朝九晚五的枯燥生活，想要一个更灵活的时间安排。</span>
-  <audio controls><source src="md-file/audio/most-common-american-idioms_xiaolai/001.2.mp3" type="audio/mpeg"></audio>
+  <audio controls><source src="https://ahjindeg.github.io/docs/english/resources/md-file/audio/most-common-american-idioms_xiaolai/001.2.mp3" type="audio/mpeg"></audio>
 - <span lang="en">Not everyone is suited for a *9-to-5* routine.</span> <span lang="cn">并不是所有人都适合朝九晚五的作息。</span>
-  <audio controls><source src="md-file/audio/most-common-american-idioms_xiaolai/001.3.mp3" type="audio/mpeg"></audio>
+  <audio controls><source src="https://ahjindeg.github.io/docs/english/resources/md-file/audio/most-common-american-idioms_xiaolai/001.3.mp3" type="audio/mpeg"></audio>
 
 ## 2. ...
 
