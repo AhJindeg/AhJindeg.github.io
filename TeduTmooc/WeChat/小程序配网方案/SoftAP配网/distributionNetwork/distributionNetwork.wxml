@@ -1,0 +1,19 @@
+<!-- distributionNetwork.wxml -->
+<view class="distribution-network">
+  <view class="head-title">
+    SoftAp 配网
+    <van-icon name="question-o" bind:click="openDescription" />
+  </view>
+  <view class="head-title-tip">选择路由 Wi-Fi</view>
+  <view class="body">
+    <van-field label="Wi-Fi" value="{{ ssid }}" readonly="{{true}}" is-link bindtap="operationWifiList" data-type="open" />
+    <van-field label="BSSID" value="{{ bssid }}" readonly="{{true}}" />
+    <van-field label="密码" model:value="{{ password }}" placeholder="请输入 Wi-Fi 密码" />
+  </view>
+  <van-button bind:click="onDistributionNetwork" class="footer-btn" type="info">一 键 配 网</van-button>
+  <van-action-sheet show="{{ choiceWifiShow }}" title="选择 Wi-Fi" bind:close="operationWifiList" data-type="close">
+    <van-picker show-toolbar columns="{{ wifiList }}" bind:confirm="confirmWifi" bind:cancel="operationWifiList" data-type="close" default-index="{{ currentWifiIndex }}" />
+  </van-action-sheet>
+  <van-toast id="van-toast" />
+  <van-dialog id="van-dialog" class="dialog-footer_text-blue dialog__message-text__line-height" />
+</view>
