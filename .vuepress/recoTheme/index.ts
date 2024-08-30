@@ -3,8 +3,9 @@ import navbar from './navbar'
 import series from './series'
 
 export const theme = recoTheme({
+  colorMode: 'light',
   style: '@vuepress-reco/style-default',
-  primaryColor: '#4d9375',
+  primaryColor: '#000000',
   author: 'AhJindeg',
   authorAvatar: '/head.png',
   home: '/',
