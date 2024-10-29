@@ -11,7 +11,7 @@
 }
 
 .magic-card::before {
-  background: radial-gradient(200px circle at var(--x) var(--y), #000 0, #000 50%, transparent 100%) !important;
+  background: radial-gradient(200px circle at var(--x) var(--y), #fff 0, #fff 50%, transparent 100%) !important;
 }
 
 .dark .navbar-container {
