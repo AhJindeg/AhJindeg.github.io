@@ -11,7 +11,7 @@ export const theme = recoTheme({
   home: '/',
   logo: '/logo.png',
   docsRepo: 'https://github.com/AhJindeg/AhJindeg.github.io.git',
-  docsBranch: 'master',
+  docsBranch: 'main',
   docsDir: '',
   lastUpdatedText: '',
   editLink: false,

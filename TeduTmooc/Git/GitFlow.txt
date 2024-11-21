@@ -4,7 +4,7 @@
 
 1. 拉取devlop代码为来源创建feature分支
 2. 提交feature分支新功能代码
-3. 合并master代码至devlop分支
+3. 合并main代码至devlop分支
 4. 合并feature代码至devlop分支
 5. 解决devlop分支代码合并冲突
 6. 测试devlop代码是否可运行
@@ -12,14 +12,14 @@
 
 ## 测试发版
 
-* 需发布测试时 将devlop合并至master
+* 需发布测试时 将devlop合并至main
 
 ## 测试Bug修改
 
-1. 拉取master代码为来源创建hotfix分支
+1. 拉取main代码为来源创建hotfix分支
 2. 提交hotfix分支Bug修复代码
-3. 合并hotfix代码至master分支
-4. 测试master代码Bug是否已修复
+3. 合并hotfix代码至main分支
+4. 测试main代码Bug是否已修复
 5. 同步hotfix代码至devlop分支
 6. 删除hotfix分支
 
@@ -27,14 +27,14 @@
 
 ## GitFlow
 
-git 分支分为主分支 `<master>`、版本分支 `<release>`、集成分支 `<develop>`、功能分支 `<feature>、`修复分支 `<hotfix>`。
+git 分支分为主分支 `<main>`、版本分支 `<release>`、集成分支 `<develop>`、功能分支 `<feature>、`修复分支 `<hotfix>`。
 
-- master（主分支）
+- main（主分支）
   - 该分支唯一。永远是可用的稳定版本，不能直接在该分支上开发。
-  - 对应线上版本，版本上线后开发人员将对应 release 版本合并至 master 分支。
+  - 对应线上版本，版本上线后开发人员将对应 release 版本合并至 main 分支。
 - release（预发分支）
   - 命名：release/版本号-期次号
-  - 同 master 分支，预发环境通过之后，上线之前，合并 release 分支
+  - 同 main 分支，预发环境通过之后，上线之前，合并 release 分支
 - develop（开发主分支）
   - 该分支唯一。所有新功能以这个分支来创建自己的开发分支，该分支只做只合并操作，不能直接在该分支上开发。
 - feature（功能开发分支）
@@ -48,7 +48,7 @@ git 分支分为主分支 `<master>`、版本分支 `<release>`、集成分支 `
   - feature 分支在申请合并之后，未合并之前还是可以提交代码的，所以 feature 在合并之前还可以在原分支上继续修复 bug 。
 - hotfix（紧急 bug 修改分支）
   - 命名：hotfix/功能&模块
-  - 在 master 分支上创建，修复完成后合并到 master 和 develop 。
+  - 在 main 分支上创建，修复完成后合并到 main 和 develop 。
 
 
 ## Git 提交规范
