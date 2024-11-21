@@ -1,0 +1,1 @@
+const e=JSON.parse('{"key":"v-492a4b36","path":"/TeduTmooc/Js/JSjianjiezhidao.html","title":"纯函数","lang":"zh-CN","frontmatter":{},"headers":[],"git":{"createdTime":1732160729000,"updatedTime":1732160729000,"contributors":[{"name":"AhJindeg","email":"AhJindeg@gmail.com","commits":1}]},"filePathRelative":"TeduTmooc/Js/JS简洁之道.md"}');export{e as data};
