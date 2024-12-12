@@ -1,0 +1,1 @@
+const e=JSON.parse('{"key":"v-7ee27c6d","path":"/TeduTmooc/Js/Reducehanshudeshiyong.html","title":"作为加法器和累加器","lang":"zh-CN","frontmatter":{},"headers":[],"git":{"createdTime":1733975337000,"updatedTime":1733975337000,"contributors":[{"name":"AhJindeg","email":"AhJindeg@gmail.com","commits":1}]},"filePathRelative":"TeduTmooc/Js/Reduce函数的使用.md"}');export{e as data};
