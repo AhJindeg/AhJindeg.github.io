@@ -1,1 +1,0 @@
-const e=JSON.parse('{"key":"v-dff70dd2","path":"/TeduTmooc/CSS/CSSdaimapianduan.html","title":"Scroll behavior 为文档添加平滑滚动效果","lang":"zh-CN","frontmatter":{},"headers":[],"git":{"createdTime":1733975337000,"updatedTime":1733975337000,"contributors":[{"name":"AhJindeg","email":"AhJindeg@gmail.com","commits":1}]},"filePathRelative":"TeduTmooc/CSS/CSS代码片段.md"}');export{e as data};
