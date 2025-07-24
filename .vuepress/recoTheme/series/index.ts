@@ -1,5 +1,5 @@
-import LinkConfig from "../linkConfig";
+import English from "../linkConfig/english"
 
 export default {
-  ...LinkConfig.English.series,
+  ...English.series,
 }

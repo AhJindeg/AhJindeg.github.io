@@ -1,6 +1,6 @@
 export default {
   navbar: {
-    text: '资源推荐',
+    text: '总览',
     link: '/docs/english/resources/all',
   },
   series: {
