@@ -1,0 +1,1 @@
+const e=JSON.parse('{"key":"v-7bc8bd89","path":"/library/10zhongshejiqushi.html","title":"10 个顶级 web 设计趋势，让你的应用程序脱颖而出","lang":"zh-CN","frontmatter":{},"headers":[],"git":{"createdTime":1764051310000,"updatedTime":1764051310000,"contributors":[{"name":"AhJindeg","email":"AhJindeg@gmail.com","commits":1}]},"filePathRelative":"library/10种设计趋势.md"}');export{e as data};
