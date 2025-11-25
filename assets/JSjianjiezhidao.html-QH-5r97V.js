@@ -1,0 +1,1 @@
+const e=JSON.parse('{"key":"v-6d9ad188","path":"/library/FE/JSjianjiezhidao.html","title":"纯函数","lang":"zh-CN","frontmatter":{},"headers":[],"git":{"createdTime":1764048265000,"updatedTime":1764048265000,"contributors":[{"name":"AhJindeg","email":"AhJindeg@gmail.com","commits":1}]},"filePathRelative":"library/FE/JS简洁之道.md"}');export{e as data};
