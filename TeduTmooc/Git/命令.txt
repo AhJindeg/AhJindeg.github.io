@@ -1,5 +1,0 @@
-netstat -ano|findstr ""
-
-taskkill -F -PID xxx
-
-git remote prune origin

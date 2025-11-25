@@ -1,6 +1,5 @@
-import recoTheme from 'vuepress-theme-reco'
-import navbar from './navbar'
-import series from './series'
+import recoTheme from 'vuepress-theme-reco';
+import navbar from './navbar';
 
 export const theme = recoTheme({
   colorMode: 'dark', // light dark
@@ -16,5 +15,4 @@ export const theme = recoTheme({
   lastUpdatedText: '',
   editLink: false,
   navbar,
-  series
-})
+});

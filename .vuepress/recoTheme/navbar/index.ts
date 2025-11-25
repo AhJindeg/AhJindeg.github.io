@@ -1,7 +1,6 @@
-import UserBlogs from "./user-blogs"
-import Tools from "./tools"
-import Technology from "./technology"
-import English from "../linkConfig/english"
+import UserBlogs from "./user-blogs";
+import Tools from "./tools";
+import Technology from "./technology";
 
 export default [
   {
@@ -16,12 +15,5 @@ export default [
   UserBlogs,
   Tools,
   Technology,
-  {
-    text: '英语练习',
-    icon: 'Book',
-    children: [
-      English.navbar,
-    ],
-  },
   { text: '友情链接', icon: 'At', link: '/friendship-link' },
-]
+];
