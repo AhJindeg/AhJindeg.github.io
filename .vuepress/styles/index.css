@@ -1,22 +1,9 @@
 @import './index.dark.css';
 
 .banner-brand__content > .tagline {
-  color: #fff !important;
-}
-
-.navbar-container {
-  background-color: rgb(255 255 255 / 0.6) !important;
+  color: #ffffff !important;
 }
 
 .magic-card::before {
   background: radial-gradient(200px circle at var(--x) var(--y), #000 0, #000 50%, transparent 100%) !important;
-}
-
-.category-item:hover .category-link span,
-.category-item .category-link .num,
-.category-item.active .category-link .text,
-.tag-item:hover .tag-link,
-.pagation-container .active,
-.pagation-container .jump:hover {
-  color: #000000 !important;
 }
