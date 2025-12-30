@@ -1,0 +1,10 @@
+1:"$Sreact.fragment"
+2:I[93353,["/_next/static/chunks/4770d61a13025013.js","/_next/static/chunks/7e22c88a7e4a73da.js"],"ViewportBoundary"]
+4:I[93353,["/_next/static/chunks/4770d61a13025013.js","/_next/static/chunks/7e22c88a7e4a73da.js"],"MetadataBoundary"]
+5:"$Sreact.suspense"
+7:I[90663,["/_next/static/chunks/4770d61a13025013.js","/_next/static/chunks/7e22c88a7e4a73da.js"],"IconMark"]
+:HL["/_next/static/chunks/aa657ac8b246c2dd.css","style"]
+:HL["/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+0:{"buildId":"iAjxntkSwHlQTWGrrJzWE","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"docs","paramType":null,"paramKey":"docs","hasRuntimePrefetch":false,"slots":{"children":{"name":"slug","paramType":"oc","paramKey":"tags/vscode/extensions/svenzhao.var-translation","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":false}},"isRootLayout":true},"head":["$","$1","h",{"children":[null,["$","$L2",null,{"children":"$@3"}],["$","div",null,{"hidden":true,"children":["$","$L4",null,{"children":["$","$5",null,{"name":"Next.Metadata","children":"$@6"}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"isHeadPartial":false,"staleTime":300}
+3:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+6:[["$","title","0",{"children":"驼峰翻译助手"}],["$","meta","1",{"property":"og:title","content":"驼峰翻译助手"}],["$","meta","2",{"property":"og:image","content":"http://localhost:3000/og/docs/tags/vscode/extensions/svenzhao.var-translation/image.png"}],["$","meta","3",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","4",{"name":"twitter:title","content":"驼峰翻译助手"}],["$","meta","5",{"name":"twitter:image","content":"http://localhost:3000/og/docs/tags/vscode/extensions/svenzhao.var-translation/image.png"}],["$","link","6",{"rel":"icon","href":"/logo.png"}],["$","$L7","7",{}]]

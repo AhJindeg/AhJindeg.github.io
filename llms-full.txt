@@ -1,0 +1,896 @@
+# Hello World
+
+
+
+Welcome to the docs! You can start writing documents in `/content/docs`.
+
+
+# 关于 JSON 序列化与反序列化那些事
+
+
+
+## JSON.stringify：格式化
+
+* JSON.stringify 内有 ***格式化*** 程序。
+* JSON.stringify(user, null, 2) 设置格式为 2 个缩进空格，也可以通过 第三个参数 定义缩进的内容。
+
+## JSON.stringify：隐藏 字符串化数据中的 属性
+
+* JSON.stringify 第二个参数被称为 ***replacer***。
+* 它是一个 函数(不保留) 或 数组(保留)，用于决定数据 保留 或 不保留 在输出中。
+
+```javascript
+# 隐藏password用户
+JSON.stringify(user, (key, value) = {
+  if (key === 'password') return
+  return value;
+})
+
+# 重构
+function stripKeys(...keys) {
+  return (key, value) = {
+    if (keys.includes(key)) return
+    return value;
+  };
+}
+JSON.stringify(user, stripKeys('password', 'gender'))
+
+# 还可以传递一个数组来仅获取某些键
+JSON.stringify(user, ['name', 'age'])
+```
+
+## JSON.stringify：使用 toJSON 创建自定义输出格式
+
+* 如果一个对象实现了该 ***toJSON*** 函数，JSON.stringify 将使用它来对数据进行字符串化。
+
+```javascript
+class Fraction {
+  constructor(n, d) {
+    this.numerator = n;
+    this.denominator = d;
+ }
+}
+JSON.stringify(new Fraction(1, 2))
+
+# 如果我们想用一个字符串替换它1/2
+class Fraction {
+  constructor(n, d) {
+    this.numerator = n;
+    this.denominator = d;
+  }
+  toJSON() {
+    return `${this.numerator}/${this.denominator}`
+  }
+}
+JSON.stringify(new Fraction(1, 2))
+```
+
+## JSON.parse： 恢复数据
+
+* 通过传递 第二个参数 JSON.parse 来指定 ***reviver*** 函数。
+* 恢复器的工作是将字符串化数据 恢复 其原始形式。
+* 我们传递了一个 reviver，它是类的静态 fromJSON 属性 Fraction。
+* reviver 检查该值是否是一个合法的分数，如果是，它会创建一个新 Fraction 对象并返回它。
+
+```javascript
+class Fraction {
+  constructor(n, d) {
+    this.numerator = n
+    this.denominator = d
+  }
+  toJSON() {
+    return `${this.numerator}/${this.denominator}`
+  }
+  static fromJSON(key, value) {
+    if (typeof value === 'string') {
+      const parts = value.split('/').map(Number)
+      if (parts.length === 2) return new Fraction(parts)
+    }
+    return value
+  }
+}
+const fraction = new Fraction(1, 2)
+const stringified = JSON.stringify(fraction)
+// "1/2"
+const revived = JSON.parse(stringified, Fraction.fromJSON)
+```
+
+* 此功能用于内置的 Date 对象。尝试查找 `Date.prototype.toJSON`。
+* JSON.stringify(new Date())。
+* 恢复日期，我们可以使用 JSON.parse。
+
+```javascript
+function reviveDate(key, value) {
+  const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,}|)Z$/
+  if (typeof value === 'string' && regex.test(value)) return new Date(value)
+  return value
+}
+JSON.parse('"2022-03-01T06:28:41.308Z"', reviveDate)
+```
+
+## JSON.parse：使用 *revivers* 隐藏数据
+
+* 与解析器一样，恢复器也可用于隐藏数据。它以相同的方式工作。
+
+```javascript
+const user = JSON.stringify( ... );
+JSON.parse(user, (key, value) = {
+    if (key === 'password') return;
+    return value;
+})
+```
+
+
+# 给 Window 增加自定义属性声明
+
+
+
+## 给 Window 增加一个简单的类型声明
+
+创建一个 `xxx.d.ts` 文件，使用 `declare` 声明类型 \<注意：此文件中不可以具有 `import` 等导入方法>
+
+```typescript
+<env.d.ts>
+
+/// <reference types="vite/client" />
+
+declare module '*.vue' {
+  import { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}
+
+declare interface Window {
+  canvas: {
+    e: boolean[],
+    x: number,
+    y: string
+  }
+}
+```
+
+## 给 Window 增加一个复杂的类型声明
+
+因为在声明文件中使用 `import` 会导致被当作一个模块导致类型声明失效，如果我们要给 Window 增加一个已经声明好的类型就需要先创建一个文件用于定义全局命名空间，我们可以在命名空间中引入类型
+
+创建 `xxx.d.ts` 文件 -> 创建命名空间 -> 在 Window 声明文件中使用命名空间定义的类型
+
+```typescript
+<window.d.ts>
+
+import { CanvasPlus, Canvas } from '@/declare'
+
+declare namespace WindowCanvas {
+  interface CanvasInterface extends Canvas {
+    canvas: CanvasPlus
+  }
+}
+
+export = WindowCanvas
+export as namespace WindowCanvas
+```
+
+```typescript
+<env.d.ts>
+
+/// <reference types="vite/client" />
+
+declare module '*.vue' {
+  import { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}
+
+declare interface Window {
+  windowCanvas: WindowCanvas.CanvasInterface
+}
+```
+
+
+# 配置 prototype 防止往同一地址跳转时会报错的情况
+
+
+
+#### 修改 VueRouter 配置 prototype 防止往同一地址跳转时会报错的情况
+
+### router / index.js
+
+```javascript
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+
+Vue.use(Router)
+
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location, onResolve, onReject) {
+  if (onResolve || onReject)
+    return originalPush.call(this, location, onResolve, onReject)
+  return originalPush.call(this, location).catch((err) => err)
+}
+
+const originalReplace = VueRouter.prototype.receive
+VueRouter.prototype.replace = function replace(location, onResolve, onReject) {
+  if (onResolve || onReject)
+    return originalReplace.call(this, location, onResolve, onReject)
+  return originalReplace.call(this, location).catch((err) => err)
+}
+```
+
+
+# 关于在 VUE3 中样式穿透的小建议
+
+
+
+#### 使用 VUE3 项目后会因为使用的 CSS 预处理 不同导致`/deep/ & v-deep & >>>` 无效或者报错
+
+可以修改为使用 `:deep(.className)`
+
+设置 ***全局样式*** 使用 `:global(.className)`
+
+设置 ***插槽样式*** 使用 `:slotted(.className)`
+
+
+# VScode 配置 常用log 代码片段
+
+
+
+```json
+{
+  "Console Log": {
+    "body": [
+      "console.log(`%c$TM_FILENAME:%c$TM_LINE_NUMBER: `, `color: ${9:green};`,`color: ${10:red};`, {",
+      " ${1} ",
+      "})"
+    ],
+    "description": "Console Log",
+    "prefix": "consolelog",
+  },
+  "Console Table": {
+    "body": [
+      "console.table(${1}, [${2}])"
+    ],
+    "description": "Console Table",
+    "prefix": "consoletable",
+  },
+  "Console Dir": {
+    "body": [
+      "console.dir(${1}, { depth: ${2:2} })"
+    ],
+    "description": "Console Dir",
+    "prefix": "consoledir",
+  },
+}
+```
+
+
+# VScode 配置 深拷贝 代码片段
+
+
+
+日常进行深拷贝时我们会使用 ***JSON.parse(JSON.stringify(data))*** 进行 copy <br />
+但是对象内有函数，或者是数据过于复杂非扁平化就会出现数据丢失的问题 <br />
+使用下面这个可以应对绝大多数需要深拷贝的场景
+
+```json
+{
+  "deepClone": {
+    "scope": "",
+    "prefix": "cloneArt",
+    "body": [
+      "const DEEP_CLONE = (_obj, _map = new WeakMap()) => {",
+      "  if (_obj instanceof Date) return new Date(_obj)",
+      "  if (_obj instanceof RegExp) return new RegExp(_obj)",
+      "  if (_map.has(_obj)) return _map.get(_obj)",
+      "  const _ALL_DESC = Object.getOwnPropertyDescriptors(_obj)",
+      "  let _cloneObj = Object.create(Object.getPrototypeOf(_obj), _ALL_DESC)",
+      "  _map.set(_obj, _cloneObj)",
+      "  for (const _key of Reflect.ownKeys(_obj)) {",
+      "    const _VALUE = _obj[_key]",
+      "    const _JUDGMENT = _VALUE instanceof Object && typeof _VALUE !== 'function'",
+      "    _cloneObj[_key] = _JUDGMENT ? DEEP_CLONE(_VALUE, _map) : _VALUE",
+      "  }",
+      "  return _cloneObj",
+      "}"
+    ],
+    "description": "The ultimate deep copy data content!"
+  }
+}
+```
+
+
+# VScode 配置 .gitignore 代码片段
+
+
+
+```json
+{
+  "Gitignore": {
+    "prefix": "gitignore",
+    "body": [
+      "*.DS_Store",
+      ".idea/",
+      "",
+      "node_modules",
+      "dist-ssr",
+      "dist",
+      "",
+      "*.local",
+      "*-lock.*",
+      "!pnpm-lock.yaml",
+      "*.lock",
+      "*.log",
+      "",
+      "auto-*.d.ts",
+    ],
+    "description": "gitignore file"
+  }
+}
+```
+
+
+# VScode 配置 pinia 代码片段
+
+
+
+```json
+{
+	"Pinia Store Base": {
+		"prefix": "pstore",
+		"body": [
+			"import { defineStore, acceptHMRUpdate } from \"pinia\"",
+			"",
+			"export const use${TM_FILENAME_BASE/(.*)/${1:/capitalize}/}Store = defineStore(\"$TM_FILENAME_BASE\", {",
+			"\tstate: () => ({",
+			"\t\t$0",
+			"\t}),",
+			"\tgetters: {},",
+			"\tactions: {},",
+			"})",
+			"",
+			"if (import.meta.hot) {",
+			"\timport.meta.hot.accept(acceptHMRUpdate(use${TM_FILENAME_BASE/(.*)/${1:/capitalize}/}Store, import.meta.hot))",
+			"}",
+			""
+		],
+		"description": "Base code needed for a Pinia store file"
+	},
+	"Pinia Store Base - Composition API": {
+		"prefix": "pstore-composition",
+		"body": [
+			"import { defineStore, acceptHMRUpdate } from \"pinia\"",
+			"",
+			"export const use${TM_FILENAME_BASE/(.*)/${1:/capitalize}/}Store = defineStore(\"$TM_FILENAME_BASE\", () => {",
+			"\t${0}",
+			"})",
+			"",
+			"if (import.meta.hot) {",
+			"\timport.meta.hot.accept(acceptHMRUpdate(use${TM_FILENAME_BASE/(.*)/${1:/capitalize}/}Store, import.meta.hot))",
+			"}",
+			""
+		],
+		"description": "Base code needed for a Pinia store file with Composition API"
+	}
+}
+```
+
+
+# VScode 配置 vue-router 代码片段
+
+
+
+```json
+{
+  "Vue Routing Link": {
+    "prefix": "vrlink",
+    "body": [
+      "<router-link to=\"/${1:path}\">${2:linkTitle}</router-link>"
+    ],
+    "description": "vue router link"
+  },
+  "Vue Routing Link with param": {
+    "prefix": "vrlink-param",
+    "body": [
+      "<router-link :to=\"`/${1:path}/${${2:param}}`\">${3:linkTitle}</router-link>"
+    ],
+    "description": "vue router link with param"
+  },
+  "Vue Router": {
+    "prefix": "vrouter",
+    "body": [
+      "import Vue from 'vue';",
+      "import VueRouter from 'vue-router';",
+      "",
+      "Vue.use(VueRouter);",
+      "",
+      "export const router = new VueRouter({",
+      "\tbase: '/',",
+      "\tmode: 'history',",
+      "\troutes: [",
+      "\t\t{ path: '/path', component: component }",
+      "\t]",
+      "});"
+    ],
+    "description": "Base for Vue Router"
+  },
+  "Vue Router scrollBehavior": {
+    "prefix": "vscrollbehavior",
+    "body": [
+      "scrollBehavior(to, from, savedPosition) {",
+      "\tif(savedPosition) {",
+      "\t\treturn savedPosition;",
+      "\t} else {",
+      "\t\treturn { x: 0, y: 0 };",
+      "\t}",
+      "},"
+    ],
+    "description": "Vue Router scrollBehavior"
+  },
+  "Vue Router beforeEach": {
+    "prefix": "vbeforeeach",
+    "body": [
+      "router.beforeEach((to, from, next) => {",
+      "\t${1:next();}",
+      "});"
+    ],
+    "description": "Vue Router global guards beforeEach"
+  },
+  "Vue Router beforeResolve": {
+    "prefix": "vbeforeresolve",
+    "body": [
+      "router.beforeResolve((to, from, next) => {",
+      "\t${1:next();}",
+      "});"
+    ],
+    "description": "Vue Router global guards beforeResolve"
+  },
+  "Vue Router afterEach": {
+    "prefix": "vaftereach",
+    "body": [
+      "router.afterEach((to, from) => {",
+      "\t",
+      "});"
+    ],
+    "description": "Vue Router global guards afterEach"
+  },
+  "Vue Router beforeEnter": {
+    "prefix": "vbeforeenter",
+    "body": [
+      "beforeEnter(to, from, next) {",
+      "\t${1:next();}",
+      "},"
+    ],
+    "description": "Vue Router per-route guard beforeEnter"
+  },
+  "Vue Router beforeRouteEnter": {
+    "prefix": "vbeforerouteenter",
+    "body": [
+      "beforeRouteEnter(to, from, next) {",
+      "\tnext(vm => {${1:}});",
+      "},"
+    ],
+    "description": "Vue Router component guards beforeRouteEnter"
+  },
+  "Vue Router beforeRouteUpdate": {
+    "prefix": "vbeforerouteupdate",
+    "body": [
+      "beforeRouteUpdate(to, from, next) {",
+      "\t${1:next();}",
+      "},"
+    ],
+    "description": "Vue Router component guards beforeRouteUpdate"
+  },
+  "Vue Router beforeRouteLeave": {
+    "prefix": "vbeforerouteleave",
+    "body": [
+      "beforeRouteLeave(to, from, next) {",
+      "\t${1:next();}",
+      "},"
+    ],
+    "description": "Vue Router component guards beforeRouteLeave"
+  },
+  "Vue Router Route": {
+    "prefix": "vroute-named",
+    "body": [
+      "{",
+      "\tpath: '${1:pathName}',",
+      "\tname: '${2:routeName}',",
+      "\tcomponent: () => import('./${3:pathToComponent}'),",
+      "},"
+    ],
+    "description": "Vue Router route with per route code-splitting"
+  }
+}
+```
+
+
+# VScode 配置 vue3 代码片段
+
+
+
+```json
+{
+	"Vue Single File Template": {
+		"prefix": "vbase",
+		"body": [
+			"<script setup lang=\"ts\">",
+			"",
+			"</script>",
+			"",
+			"<template>",
+			"",
+			"</template>",
+			"",
+			"<style lang=\"scss\" scoped>",
+			"",
+			"</style>"
+		],
+		"description": "Vue Single File Template"
+	},
+	"Vue Script Element": {
+		"prefix": "vscript",
+		"body": [
+			"<script setup lang=\"ts\">",
+			"",
+			"</script>",
+		],
+		"description": "Vue Script Element"
+	},
+	"Vue Template Element": {
+		"prefix": "vtemplate",
+		"body": [
+			"<template>",
+			"",
+			"</template>",
+		],
+		"description": "Vue Template Element"
+	},
+	"Vue Style Element": {
+		"prefix": "vstyle",
+		"body": [
+			"<style lang=\"scss\" scoped>",
+			"",
+			"</style>"
+		],
+		"description": "Vue Style Element"
+	},
+	"Vue Transition": {
+		"prefix": "vtrans",
+		"body": [
+			"<Transition name=\"${1:transitionName}\">",
+			"\t${0}",
+			"</Transition>"
+		],
+		"description": "vue transition component"
+	},
+	"Vue Transition Group": {
+		"prefix": "vtrans-group",
+		"body": [
+			"<TransitionGroup name=\"${1:transitionName}\">",
+			"\t${0}",
+			"</TransitionGroup>"
+		],
+		"description": "vue transition group component"
+	},
+	"Vue Ref": {
+		"prefix": "vref",
+		"body": [
+			"const ${1:name} = ref(${2:initialValue})"
+		],
+		"description": "Vue Ref"
+	},
+	"Vue Ref typed": {
+		"prefix": "vref-typed",
+		"body": [
+			"const ${1:name} = ref<${2:type}>(${3:initialValue})"
+		],
+		"description": "Vue Ref with generic type argument"
+	},
+	"Vue Reactive": {
+		"prefix": "vreactive",
+		"body": [
+			"const ${1:name} = reactive({",
+			"\t${2:count}: ${3:0}",
+			"})"
+		],
+		"description": "Vue reactive"
+	},
+	"Vue Computed": {
+		"prefix": "vcomputed",
+		"body": [
+			"const ${1:name} = computed(() => {",
+			"\treturn ${2}",
+			"})"
+		],
+		"description": "Vue computed"
+	},
+	"Vue Watch": {
+		"prefix": "vwatch",
+		"body": [
+			"watch(",
+			"\t() => ${1:name},",
+			"\t() => {",
+			"\t\t${2}",
+			"\t}",
+			")"
+		],
+		"description": "Vue watcher"
+	},
+	"Vue Watch Effect": {
+		"prefix": "vwatcheffect",
+		"body": [
+			"watchEffect(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue Watch Effect"
+	},
+	"Vue Lifecycle Hooks - onMounted": {
+		"prefix": "vonmounted",
+		"body": [
+			"onMounted(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue onMounted Lifecycle hook"
+	},
+	"Vue Lifecycle Hooks - onBeforeMount": {
+		"prefix": "vonbeforemount",
+		"body": [
+			"onBeforeMount(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue onBeforeMount Lifecycle hook"
+	},
+	"Vue Lifecycle Hooks - onBeforeUpdate": {
+		"prefix": "vonbeforeupdate",
+		"body": [
+			"onBeforeUpdate(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue onBeforeUpdate Lifecycle hook"
+	},
+	"Vue Lifecycle Hooks - onUpdated": {
+		"prefix": "vonupdated",
+		"body": [
+			"onUpdated(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue onUpdated Lifecycle hook"
+	},
+	"Vue Lifecycle Hooks - onErrorCaptured": {
+		"prefix": "vonerrorcaptured",
+		"body": [
+			"onErrorCaptured(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue onErrorCaptured Lifecycle hook"
+	},
+	"Vue Lifecycle Hooks - onUnmounted": {
+		"prefix": "vonunmounted",
+		"body": [
+			"onUnmounted(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue onUnmounted Lifecycle hook"
+	},
+	"Vue Lifecycle Hooks - onBeforeUnmount": {
+		"prefix": "vonbeforeunmount",
+		"body": [
+			"onBeforeUnmount(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue onBeforeUnmount Lifecycle hook"
+	},
+	"Vue Define Props": {
+		"prefix": "vdefineprops",
+		"body": [
+			"defineProps<{",
+			"\t${1:name}: ${2:type}",
+			"}>()"
+		],
+		"description": "Vue defineProps"
+	},
+	"Vue Define Props with defaults": {
+		"prefix": "vdefineprops-withdefaults",
+		"body": [
+			"withDefaults(defineProps<{",
+			"\t${1:name}: ${2:type}",
+			"}>(), {",
+			"\t${1:name}: ${3:default}",
+			"})"
+		],
+		"description": "Vue withDefaults(defineProps)"
+	},
+	"Vue Define Emits": {
+		"prefix": "vdefineemits",
+		"body": [
+			"const emit = defineEmits<{",
+			"\t${1:eventName}: [${0}]",
+			"}>()"
+		],
+		"description": "Vue defineEmits"
+	},
+	"Vue Single Emit": {
+		"prefix": "vsingleemit",
+		"body": [
+			"${1:eventName}: [${0}]",
+		],
+		"description": "Vue single emit for defineEmits"
+	},
+	"Vue Define Slots": {
+		"prefix": "vdefineslots",
+		"body": [
+			"defineSlots<{",
+			"\tdefault: (props: { ${0} }) => any",
+			"}>()"
+		],
+		"description": "Vue defineSlots"
+	},
+	"Vue Single Slot": {
+		"prefix": "vsingleslot",
+		"body": [
+			"\t${1:slotName}: (props: { ${0} }) => any",
+		],
+		"description": "Vue single slot for defineSlots"
+	},
+	"Vue Define Options": {
+		"prefix": "vdefineoptions",
+		"body": [
+			"defineOptions({",
+			"\t${0}",
+			"})"
+		],
+		"description": "Vue defineOptions"
+	},
+	"Vue Define Model": {
+		"prefix": "vdefinemodel",
+		"body": [
+			"const modelValue = defineModel()",
+		],
+		"description": "Vue defineModel"
+	},
+	"Vue Style Binding Object": {
+		"prefix": "vstyle-obj",
+		"body": [
+			":style=\"[${2:styleObjectA}, ${3:styleObjectB]}\""
+		],
+		"description": "vue inline style binding, objects"
+	},
+	"Vue Class Binding": {
+		"prefix": "vclass",
+		"body": [
+			":class=\"{ '${2:classList}': ${1:condition} }\""
+		],
+		"description": "vue class binding"
+	},
+	"Vue Class Binding Ternary": {
+		"prefix": "vclass-ter",
+		"body": [
+			":class=\"[${1:condition} ? '${2:classListOnTrue}' : '${3:classListOnFalse}']\""
+		],
+		"description": "vue ternary class binding"
+	},
+}
+```
+
+
+# git-commit-plugin
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### 插件地址：[git-commit-plugin](https://marketplace.visualstudio.com/items?itemName=redjue.git-commit-plugin)
+
+分享一款自己平时进行 Git 提交时的插件，使用此插件根据步骤提示可以直接进行规范的 commit 提交。
+
+<img alt="AhJindeg-1701079399727" src={__img0} placeholder="blur" />
+
+### 第一步：选择提交
+
+<img alt="AhJindeg-1701079405956" src={__img1} placeholder="blur" />
+
+### 第二步：选择提交类型
+
+<img alt="AhJindeg-1701079412095" src={__img2} placeholder="blur" />
+
+### 第三步：进行 commit 填写
+
+<img alt="AhJindeg-1701079418474" src={__img3} placeholder="blur" />
+
+选择对应的选项-Enter-填写内容-Enter-继续重复
+
+<img alt="AhJindeg-1701079424922" src={__img4} placeholder="blur" />
+
+<img alt="AhJindeg-1701079430839" src={__img5} placeholder="blur" />
+
+### 第四步：完成提交 生成 commit 信息
+
+<img alt="AhJindeg-1701079437654" src={__img6} placeholder="blur" />
+
+
+# 驼峰翻译助手
+
+
+
+
+
+
+
+
+
+#### 插件地址：[驼峰翻译助手](https://marketplace.visualstudio.com/items?itemName=svenzhao.var-translation)
+
+纠结怎么取变量? 中文一键翻译转换成常用大小驼峰等格式 <br />
+也可以英文一键转换成常用大小驼峰等格式
+
+<img alt="AhJindeg-1701078098855" src={__img0} placeholder="blur" />
+
+### 快捷键
+
+```
+win: "Alt+shift+t"
+mac: "cmd+shift+t"
+```
+
+<img alt="AhJindeg-1701078111443" src={__img1} placeholder="blur" />
+
+### 使用 `ctrl+shift+P`
+
+<img alt="AhJindeg-1701078123349" src={__img2} placeholder="blur" />
+
+
+# 顶部浮动显示当前层级
+
+
+
+
+
+#### 新版 VScode 属性，翻滚时可以在顶部浮动显示当前层级。
+
+```json
+"editor.experimental.stickyScroll.enabled": true
+```
+
+<img alt="AhJindeg-1701076874210" src={__img0} placeholder="blur" />
+
+
+# 控制资源管理器是否应以紧凑形式呈现文件夹
+
+
+
+
+
+
+
+#### 控制资源管理器是否应以紧凑形式呈现文件夹。在此形式中，单个子文件夹将被压缩在组合的树元素中。
+
+```json
+"explorer.compactFolders": false
+```
+
+### 开启
+
+<img alt="AhJindeg-1701156705523" src={__img0} placeholder="blur" />
+
+### 关闭
+
+<img alt="AhJindeg-1701156684507" src={__img1} placeholder="blur" />

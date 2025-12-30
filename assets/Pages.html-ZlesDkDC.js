@@ -1,1 +1,0 @@
-const e=JSON.parse('{"key":"v-01969a6c","path":"/snippet-box/yudao-ui/Pages.html","title":"","lang":"zh-CN","frontmatter":{},"headers":[],"git":{"createdTime":1764051310000,"updatedTime":1764051310000,"contributors":[{"name":"AhJindeg","email":"AhJindeg@gmail.com","commits":1}]},"filePathRelative":"snippet-box/yudao-ui/Pages.md"}');export{e as data};
