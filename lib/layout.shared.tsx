@@ -1,15 +1,8 @@
-import { AlbumIcon } from 'lucide-react';
 import type { BaseLayoutProps, LinkItemType } from 'fumadocs-ui/layouts/shared';
 import Image from 'next/image';
 import Logo from '@/public/logo.png'
 
 export const linkItems: LinkItemType[] = [
-  {
-    icon: <AlbumIcon />,
-    text: 'Blog',
-    url: '/blog',
-    active: 'nested-url',
-  },
   {
     type: 'icon',
     url: 'https://github.com/AhJindeg',

@@ -20,6 +20,20 @@ export const docs = defineDocs({
   },
 });
 
+// Blog collection 配置
+export const blog = defineDocs({
+  dir: 'content/blog',
+  docs: {
+    schema: frontmatterSchema,
+    postprocess: {
+      includeProcessedMarkdown: true,
+    },
+  },
+  meta: {
+    schema: metaSchema,
+  },
+});
+
 export default defineConfig({
   mdxOptions: {
     // MDX options
