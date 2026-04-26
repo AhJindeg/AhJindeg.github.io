@@ -209,6 +209,19 @@ JSON.parse(user, (key, value) => {
 ```
 
 
+# CRUD
+
+
+
+```vue
+<template>
+  <div>
+    <h1>Yudao UI CRUD</h1>
+  </div>
+</template>
+```
+
+
 # 常用log 代码片段
 
 
@@ -748,16 +761,3 @@ VueRouter.prototype.replace = function replace(location, onResolve, onReject) {
 * **子组件/深层选择器**：使用 `:deep(.className)`。
 * **全局样式**：使用 `:global(.className)`。
 * **插槽内容样式**：使用 `:slotted(.className)`。
-
-
-# CRUD
-
-
-
-```vue
-<template>
-  <div>
-    <h1>Yudao UI CRUD</h1>
-  </div>
-</template>
-```
