@@ -1,6 +1,6 @@
 import type { BaseLayoutProps, LinkItemType } from 'fumadocs-ui/layouts/shared';
 import Image from 'next/image';
-import Logo from '@/public/logo.png'
+import Logo from '@/public/logo.png';
 
 export const linkItems: LinkItemType[] = [
   {
@@ -25,10 +25,10 @@ export function baseOptions(): BaseLayoutProps {
           <Image
             alt="AhJindeg's Blog"
             src={Logo}
-            className="w-8 h-8 in-[.uwu]:block"
+            className="w-8 h-8"
             aria-label="AhJindeg's Blog"
           />
-          <span className="font-medium in-[.uwu]:hidden">AhJindeg's Blog</span>
+          <span className="font-medium">AhJindeg's Blog</span>
         </>
       ),
     },

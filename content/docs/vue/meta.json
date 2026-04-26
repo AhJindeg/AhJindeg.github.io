@@ -1,0 +1,8 @@
+{
+  "title": "Vue",
+  "root": true,
+  "pages": [
+    "vue-router",
+    "vue3"
+  ]
+}

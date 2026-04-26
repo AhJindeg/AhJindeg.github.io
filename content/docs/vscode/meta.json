@@ -1,0 +1,10 @@
+{
+  "title": "VSCode",
+  "root": true,
+  "pages": [
+    "index",
+    "code-snippets",
+    "settings",
+    "extensions"
+  ]
+}
