@@ -41,7 +41,7 @@ export function DocsNavbarMenu() {
           </div>
           <p className="font-medium">Introduction</p>
           <p className="text-fd-muted-foreground text-sm">
-            语言框架、编辑器与代码片段笔记总览。
+            人都有两次生命，第二次是当你意识到生命只有一次的时候。
           </p>
         </NavbarMenuLink>
 
