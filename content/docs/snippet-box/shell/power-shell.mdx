@@ -1,0 +1,74 @@
+---
+title: PowerShell
+description: Windows PowerShell 下常用命令（含部分系统工具），每条独立代码块便于复制
+---
+
+## 删除目录
+
+递归删除目录（将 `node_modules` 换成目标路径）：
+
+```powershell
+Remove-Item -Recurse -Force .\node_modules
+```
+
+等价写法（依赖 `rm` 别名）：
+
+```powershell
+rm -r -Force .\node_modules
+```
+
+## 端口占用
+
+将 `xxx` 换成端口号（如 `3306`）。`findstr` 为 Windows 自带。
+
+```powershell
+netstat -ano | findstr :xxx
+```
+
+## 结束进程
+
+将 `xxx` 换成上一步看到的 **PID**（数字）。
+
+```powershell
+taskkill /F /PID xxx
+```
+
+## 连通性探测
+
+将 `x.x.x.x` 换成主机或 IP，端口示例用 `xxx`。
+
+```powershell
+ping x.x.x.x
+```
+
+`tcping` 多为第三方工具（需已安装并在 PATH 中）：
+
+```powershell
+tcping x.x.x.x xxx
+```
+
+## 网络适配器与 DNS（ipconfig）
+
+在 PowerShell 中可直接调用：
+
+```powershell
+ipconfig /all
+```
+
+#### 释放 IP 地址
+
+```powershell
+ipconfig /release
+```
+
+#### 刷新 DNS
+
+```powershell
+ipconfig /flushdns
+```
+
+#### 重新获取 IP 地址
+
+```powershell
+ipconfig /renew
+```

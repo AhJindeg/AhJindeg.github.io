@@ -1,0 +1,116 @@
+---
+title: Docker
+description: Docker 常用命令（镜像、容器、run、compose、拷贝），每条独立代码块便于复制
+---
+
+占位符说明：`xx:xx` / `镜像:标签`，`xxx/xx:xx` 为仓库地址与标签，`xxx` 为**容器名或容器 ID**（可用 `docker ps` 查看）。
+
+## 启停
+
+```bash
+docker stop xxx
+```
+
+```bash
+docker start xxx
+```
+
+## 登录镜像仓库
+
+将 `用户名`、`仓库地址` 换成实际值（如 `registry.example.com` 或 Docker Hub 可省略域名用默认）。
+
+```bash
+docker login --username=用户名 仓库地址
+```
+
+## 镜像：拉取与推送
+
+```bash
+docker pull 仓库名/镜像:标签
+```
+
+```bash
+docker push 仓库名/镜像:标签
+```
+
+## 镜像：标记与列表
+
+本地镜像打标签（便于推送私有仓库）：
+
+```bash
+docker image tag 本地镜像:标签 仓库名/镜像:标签
+```
+
+示例：
+
+```bash
+docker image tag myapp:1.0 registry.example.com/myapp:1.0
+```
+
+列出本地镜像：
+
+```bash
+docker images
+```
+
+## 容器列表
+
+运行中的容器：
+
+```bash
+docker ps
+```
+
+含已退出容器：
+
+```bash
+docker ps -a
+```
+
+## 进入容器（推荐 exec）
+
+在运行中的容器里开交互式 shell（有 `bash` 时）：
+
+```bash
+docker exec -it xxx bash
+```
+
+仅有 `sh` 的镜像（如 Alpine）：
+
+```bash
+docker exec -it xxx sh
+```
+
+执行单条命令（不进入交互）：
+
+```bash
+docker exec xxx 命令
+```
+
+**`docker attach`**：附着到容器主进程的标准输入输出；若主进程是前台进程，误按 **Ctrl+C** 可能把容器一起结束，一般日常排错更常用 **`exec`**。
+
+```bash
+docker attach xxx
+```
+
+## 宿主机与容器互拷（docker cp）
+
+宿主机 → 容器：
+
+```bash
+docker cp /宿主机路径 xxx:/容器内路径
+```
+
+容器 → 宿主机：
+
+```bash
+docker cp xxx:/容器内路径 /宿主机路径
+```
+
+## 日志
+
+跟随日志，最近 2000 行：
+
+```bash
+docker logs -f --tail 2000 xxx
+```

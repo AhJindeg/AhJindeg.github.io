@@ -3,7 +3,8 @@
   "description": "A personal collection of code snippets that help me quickly reuse common functions, configurations, and patterns, making it easier to boost my development productivity.",
   "root": true,
   "pages": [
-    "cmd",
+    "---Shell---",
+    "...shell",
     "---Yudao UI---",
     "...yudao-ui"
   ]

@@ -1,0 +1,77 @@
+---
+title: Git
+description: Git 常用命令与配置（含 Bash 与 Windows PowerShell），每条独立代码块便于复制
+---
+
+## 用户与仓库行为
+
+```bash
+git config --global user.name "Arthur AJ. W."
+```
+
+```bash
+git config --global user.email "AhJindeg@gmail.com"
+```
+
+当前仓库忽略文件名大小写：
+
+```bash
+git config core.ignorecase true
+```
+
+## HTTP 代理
+
+```bash
+git config --global http.proxy http://127.0.0.1:xxx
+```
+
+## 远程与同步
+
+```bash
+git fetch origin --prune
+```
+
+```bash
+git pull --rebase
+```
+
+```bash
+git push -u origin HEAD
+```
+
+- `pull --rebase`：本地未推送提交接在远端最新之后，历史更线性。
+- `push -u origin HEAD`：首次推送当前分支并建立 upstream，之后可直接 `git push`。
+
+## 修改最近提交
+
+```bash
+git commit --amend --no-edit
+```
+
+## 合并中断
+
+```bash
+git merge --abort
+```
+
+## 变基中断
+
+```bash
+git rebase --abort
+```
+
+## Worktree
+
+```bash
+git worktree add ../xxx xxx
+```
+
+## 批量删除本地分支（PowerShell）
+
+在 **Windows PowerShell** 中执行；会尝试删除**所有**本地分支，**慎用**。已写成单行便于整段复制。
+
+```powershell
+git for-each-ref refs/heads --format="%(refname:short)" | ForEach-Object { git branch -D $_ }
+```
+
+更稳妥：先 `git branch` 确认列表，或改用 `git branch -d`（已合并才删）。

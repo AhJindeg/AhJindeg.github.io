@@ -1,0 +1,42 @@
+---
+title: Nginx
+description: Nginx 常用命令（配置校验、启停、重载），每条独立代码块便于复制
+---
+
+以下在已安装 **nginx** 且可执行文件在 `PATH` 时使用 `nginx`；若在安装目录下可改用 `./nginx`（Linux/macOS 常见）。
+
+## 配置校验
+
+```bash
+nginx -t
+```
+
+## 停止与优雅退出
+
+立即停止（快速关闭）：
+
+```bash
+nginx -s stop
+```
+
+优雅退出（处理完当前请求后退出）：
+
+```bash
+nginx -s quit
+```
+
+## 重载配置
+
+不中断服务、重新加载配置文件：
+
+```bash
+nginx -s reload
+```
+
+## 日志切割
+
+重新打开日志文件（配合 `mv` 备份旧日志后使用）：
+
+```bash
+nginx -s reopen
+```
