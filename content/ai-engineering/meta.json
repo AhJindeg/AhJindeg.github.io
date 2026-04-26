@@ -5,12 +5,16 @@
   "pages": [
     "index",
     "---Foundations---",
+    "foundations/index",
     "...foundations",
     "---Agent Workflows---",
+    "agent-workflows/index",
     "...agent-workflows",
     "---Capability Library---",
+    "capability-library/index",
     "...capability-library",
     "---Evaluation & Reliability---",
+    "evaluation-reliability/index",
     "...evaluation-reliability"
   ]
 }

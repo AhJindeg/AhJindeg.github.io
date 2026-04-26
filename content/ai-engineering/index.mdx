@@ -1,13 +1,23 @@
 ---
 title: Introduction
-description: AI Engineering 模块入口
+description: 从模型能力到工程交付的 AI 系统化实践入口
 ---
 
-这个模块记录 AI 从原理到落地的完整工程链路，避免只停留在“会调用 API”的层面。
+AI Engineering 不是“能调通一次”，而是把 AI 能力做成可持续交付的系统工程。  
+核心目标有三个：
 
-主要分为四个方向：
+- 能力可复现：同类输入在不同时间和环境下保持稳定质量；
+- 成本可控制：精度、延迟、预算三者可量化权衡；
+- 风险可治理：上线前能发现回归，上线后能快速定位问题。
 
-- Foundations：基础原理与关键概念
-- Agent Workflows：智能体协作流程与交付方法
-- Capability Library：可复用能力与资产沉淀
-- Evaluation & Reliability：评测体系与稳定性保障
+本模块按完整交付链路拆成四个方向：
+
+- Foundations：理解模型边界、上下文约束、检索与表示学习的底层机制；
+- Agent Workflows：把复杂任务拆成可执行、可交接、可回滚的流程；
+- Capability Library：将经验沉淀成模板、模式与可复用能力资产；
+- Evaluation & Reliability：用评测与门禁防止“看起来更好、实际变差”。
+
+## 一个常见误区
+
+很多团队把 Prompt 当成唯一优化点，结果每次改动都靠“感觉更好”。  
+更稳健的方式是：先约束输入边界和数据质量，再优化 Prompt，最后用评测验证收益。
