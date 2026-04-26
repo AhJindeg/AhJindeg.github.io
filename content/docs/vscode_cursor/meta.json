@@ -1,0 +1,13 @@
+{
+  "title": "VSCode & Cursor",
+  "icon": "PanelsTopLeft",
+  "root": true,
+  "pages": [
+    "---Settings---",
+    "...settings",
+    "---Extensions---",
+    "...extensions",
+    "---Code Snippets---",
+    "...code-snippets"
+  ]
+}

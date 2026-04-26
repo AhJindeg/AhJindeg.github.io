@@ -1,11 +1,16 @@
 {
   "title": "AI Engineering",
+  "icon": "Bot",
   "root": true,
   "pages": [
     "index",
-    "foundations",
-    "agent-workflows",
-    "capability-library",
-    "evaluation-reliability"
+    "---Foundations---",
+    "...foundations",
+    "---Agent Workflows---",
+    "...agent-workflows",
+    "---Capability Library---",
+    "...capability-library",
+    "---Evaluation & Reliability---",
+    "...evaluation-reliability"
   ]
 }

@@ -1,8 +1,10 @@
 {
   "title": "Snippet Box",
+  "icon": "Building",
   "root": true,
   "pages": [
-    "shell",
-    "yudao-ui"
+    "cmd",
+    "---Yudao UI---",
+    "...yudao-ui"
   ]
 }

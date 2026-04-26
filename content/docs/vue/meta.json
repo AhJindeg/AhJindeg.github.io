@@ -1,8 +1,11 @@
 {
   "title": "Vue",
+  "icon": "CodeXml",
   "root": true,
   "pages": [
-    "vue-router",
-    "vue3"
+    "---Vue 3---",
+    "...vue3",
+    "---Vue Router---",
+    "...vue-router"
   ]
 }
