@@ -37,7 +37,7 @@ export default function HomePage() {
         placeholder="blur"
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/30 to-black/10" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/15 to-black/10" />
 
       <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center gap-6 px-6 py-16 text-center">
         <h1 className="text-4xl font-bold text-transparent drop-shadow-md sm:text-5xl md:text-7xl bg-linear-to-r from-[#DCB67A] to-rose-500 bg-clip-text tracking-wider">

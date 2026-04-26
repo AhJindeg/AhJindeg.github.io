@@ -1,6 +1,5 @@
 {
   "title": "Snippet Box",
-  "icon": "Building",
   "root": true,
   "pages": [
     "cmd",

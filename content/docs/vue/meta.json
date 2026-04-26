@@ -1,6 +1,5 @@
 {
   "title": "Vue",
-  "icon": "CodeXml",
   "root": true,
   "pages": [
     "---Vue 3---",

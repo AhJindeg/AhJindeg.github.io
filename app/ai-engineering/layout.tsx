@@ -1,11 +1,12 @@
 import { aiSource } from '@/lib/ai-source';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import { baseOptions } from '@/lib/layout.shared';
-import type { ReactNode } from 'react';
+import { attachModuleIconsToPageTree } from '@/lib/module-icons';
 
-export default function Layout({ children }: { children: ReactNode }) {
+export default function Layout({ children }: LayoutProps<'/ai-engineering'>) {
+  const pageTree = attachModuleIconsToPageTree(aiSource.pageTree);
   return (
-    <DocsLayout tree={aiSource.pageTree} {...baseOptions()}>
+    <DocsLayout tree={pageTree} {...baseOptions()}>
       {children}
     </DocsLayout>
   );
