@@ -26,7 +26,8 @@ const socials = [
 
 export default function HomePage() {
   return (
-    <div className="relative flex min-h-[80vh] flex-1 items-center justify-center overflow-hidden">
+    /* -mt-14 + pt-14：主视觉顶到视口顶部，顶栏叠在画上；留出与导航等高的内边距避免标题被挡 */
+    <div className="relative -mt-14 flex min-h-screen flex-1 items-center justify-center overflow-hidden pt-14">
       {/* 背景与遮罩，保证文字可读性 */}
       <Image
         src={Background}
