@@ -1,11 +1,99 @@
-# Hello World
+# Introduction
 
 
 
-Welcome to the docs! You can start writing documents in `/content/docs`.
+这里放的是我在学习和工作中整理出来的笔记，主要是两类：一类是把某个概念搞清楚之后写下来的科普，另一类是遇到具体问题之后记录的解决办法。
+
+写这些的原因很简单——有些东西查一次不够，得查很多次。与其每次都重新找，不如一次写清楚放在这里。
+
+内容不追求全面，只求看了之后真的能用上。
 
 
-# 关于 JSON 序列化与反序列化那些事
+# CMD
+
+
+
+```bash
+# 查看当前目录
+pwd
+
+# 查看当前目录下的文件和目录
+ls
+
+# 查看当前目录下的文件和目录的详细信息
+ls -l
+```
+
+
+# 给 Window 增加自定义属性声明
+
+
+
+## 简单声明
+
+在独立声明文件中扩展 `Window`，注意该文件内不要写 `import`，否则会变成模块、可能无法作为全局 augment 使用（见下一节做法）。
+
+创建 `xxx.d.ts`，用 `declare` 补全类型。**注意：此文件内不要使用 `import` / `export`，否则会被视为模块，全局 `Window` 扩展可能不生效。**
+
+```typescript
+<env.d.ts>
+
+/// <reference types="vite/client" />
+
+declare module '*.vue' {
+  import { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}
+
+declare interface Window {
+  canvas: {
+    e: boolean[],
+    x: number,
+    y: string
+  }
+}
+```
+
+## 复杂声明：命名空间与可 import 的类型
+
+若需在 `Window` 上挂载**来自其他模块**的类型，单独一个无 `import` 的全局 `.d.ts` 往往不够；可先建命名空间文件，再在另一份 `env.d.ts` 里合并到 `Window`。
+
+流程概览：新建 `window.d.ts`（namespace + 可 `import`）→ 在仅 `declare` 的 `env.d.ts` 里引用该命名空间类型。
+
+```typescript
+<window.d.ts>
+
+import { CanvasPlus, Canvas } from '@/declare'
+
+declare namespace WindowCanvas {
+  interface CanvasInterface extends Canvas {
+    canvas: CanvasPlus
+  }
+}
+
+export = WindowCanvas
+export as namespace WindowCanvas
+```
+
+```typescript
+<env.d.ts>
+
+/// <reference types="vite/client" />
+
+declare module '*.vue' {
+  import { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}
+
+declare interface Window {
+  windowCanvas: WindowCanvas.CanvasInterface
+}
+```
+
+
+# 序列化与反序列化
 
 
 
@@ -20,22 +108,22 @@ Welcome to the docs! You can start writing documents in `/content/docs`.
 * 它是一个 函数(不保留) 或 数组(保留)，用于决定数据 保留 或 不保留 在输出中。
 
 ```javascript
-# 隐藏password用户
-JSON.stringify(user, (key, value) = {
+// 隐藏 password 等敏感字段
+JSON.stringify(user, (key, value) => {
   if (key === 'password') return
   return value;
 })
 
-# 重构
+// 封装为可复用工厂
 function stripKeys(...keys) {
-  return (key, value) = {
+  return (key, value) => {
     if (keys.includes(key)) return
     return value;
   };
 }
 JSON.stringify(user, stripKeys('password', 'gender'))
 
-# 还可以传递一个数组来仅获取某些键
+// 仅序列化白名单中的键
 JSON.stringify(user, ['name', 'age'])
 ```
 
@@ -52,7 +140,7 @@ class Fraction {
 }
 JSON.stringify(new Fraction(1, 2))
 
-# 如果我们想用一个字符串替换它1/2
+// 使用 toJSON 将分数序列化为 "n/d" 字符串
 class Fraction {
   constructor(n, d) {
     this.numerator = n;
@@ -114,92 +202,503 @@ JSON.parse('"2022-03-01T06:28:41.308Z"', reviveDate)
 
 ```javascript
 const user = JSON.stringify( ... );
-JSON.parse(user, (key, value) = {
+JSON.parse(user, (key, value) => {
     if (key === 'password') return;
     return value;
 })
 ```
 
 
-# 给 Window 增加自定义属性声明
+# 常用log 代码片段
 
 
 
-## 给 Window 增加一个简单的类型声明
+## 片段
 
-创建一个 `xxx.d.ts` 文件，使用 `declare` 声明类型 \<注意：此文件中不可以具有 `import` 等导入方法>
+将以下 JSON 合并进 VS Code **用户代码片段**（`javascript.json` 或 `*.code-snippets`）后，可用前缀 `consolelog` / `consoletable` / `consoledir` 快速插入。
 
-```typescript
-<env.d.ts>
-
-/// <reference types="vite/client" />
-
-declare module '*.vue' {
-  import { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
-  export default component
+```json
+{
+  "Console Log": {
+    "body": [
+      "console.log(`%c$TM_FILENAME:%c$TM_LINE_NUMBER: `, `color: ${9:green};`,`color: ${10:red};`, {",
+      " ${1} ",
+      "})"
+    ],
+    "description": "Console Log",
+    "prefix": "consolelog",
+  },
+  "Console Table": {
+    "body": [
+      "console.table(${1}, [${2}])"
+    ],
+    "description": "Console Table",
+    "prefix": "consoletable",
+  },
+  "Console Dir": {
+    "body": [
+      "console.dir(${1}, { depth: ${2:2} })"
+    ],
+    "description": "Console Dir",
+    "prefix": "consoledir",
+  },
 }
+```
 
-declare interface Window {
-  canvas: {
-    e: boolean[],
-    x: number,
-    y: string
+
+# .gitignore 代码片段
+
+
+
+## 片段
+
+前缀 `gitignore` 展开为常用忽略项（含 `!pnpm-lock.yaml` 等）。
+
+```json
+{
+  "Gitignore": {
+    "prefix": "gitignore",
+    "body": [
+      "*.DS_Store",
+      ".idea/",
+      "",
+      "node_modules",
+      "dist-ssr",
+      "dist",
+      "",
+      "*.local",
+      "*-lock.*",
+      "!pnpm-lock.yaml",
+      "*.lock",
+      "*.log",
+      "",
+      "auto-*.d.ts",
+    ],
+    "description": "gitignore file"
   }
 }
 ```
 
-## 给 Window 增加一个复杂的类型声明
 
-因为在声明文件中使用 `import` 会导致被当作一个模块导致类型声明失效，如果我们要给 Window 增加一个已经声明好的类型就需要先创建一个文件用于定义全局命名空间，我们可以在命名空间中引入类型
+# vue3 代码片段
 
-创建 `xxx.d.ts` 文件 -> 创建命名空间 -> 在 Window 声明文件中使用命名空间定义的类型
 
-```typescript
-<window.d.ts>
 
-import { CanvasPlus, Canvas } from '@/declare'
+## 片段
 
-declare namespace WindowCanvas {
-  interface CanvasInterface extends Canvas {
-    canvas: CanvasPlus
-  }
+以下为 Vue 3 + `<script setup>` + TypeScript 常用片段，按需合并到用户片段文件。
+
+```json
+{
+	"Vue Single File Template": {
+		"prefix": "vbase",
+		"body": [
+			"<script setup lang=\"ts\">",
+			"",
+			"</script>",
+			"",
+			"<template>",
+			"",
+			"</template>",
+			"",
+			"<style lang=\"scss\" scoped>",
+			"",
+			"</style>"
+		],
+		"description": "Vue Single File Template"
+	},
+	"Vue Script Element": {
+		"prefix": "vscript",
+		"body": [
+			"<script setup lang=\"ts\">",
+			"",
+			"</script>",
+		],
+		"description": "Vue Script Element"
+	},
+	"Vue Template Element": {
+		"prefix": "vtemplate",
+		"body": [
+			"<template>",
+			"",
+			"</template>",
+		],
+		"description": "Vue Template Element"
+	},
+	"Vue Style Element": {
+		"prefix": "vstyle",
+		"body": [
+			"<style lang=\"scss\" scoped>",
+			"",
+			"</style>"
+		],
+		"description": "Vue Style Element"
+	},
+	"Vue Transition": {
+		"prefix": "vtrans",
+		"body": [
+			"<Transition name=\"${1:transitionName}\">",
+			"\t${0}",
+			"</Transition>"
+		],
+		"description": "vue transition component"
+	},
+	"Vue Transition Group": {
+		"prefix": "vtrans-group",
+		"body": [
+			"<TransitionGroup name=\"${1:transitionName}\">",
+			"\t${0}",
+			"</TransitionGroup>"
+		],
+		"description": "vue transition group component"
+	},
+	"Vue Ref": {
+		"prefix": "vref",
+		"body": [
+			"const ${1:name} = ref(${2:initialValue})"
+		],
+		"description": "Vue Ref"
+	},
+	"Vue Ref typed": {
+		"prefix": "vref-typed",
+		"body": [
+			"const ${1:name} = ref<${2:type}>(${3:initialValue})"
+		],
+		"description": "Vue Ref with generic type argument"
+	},
+	"Vue Reactive": {
+		"prefix": "vreactive",
+		"body": [
+			"const ${1:name} = reactive({",
+			"\t${2:count}: ${3:0}",
+			"})"
+		],
+		"description": "Vue reactive"
+	},
+	"Vue Computed": {
+		"prefix": "vcomputed",
+		"body": [
+			"const ${1:name} = computed(() => {",
+			"\treturn ${2}",
+			"})"
+		],
+		"description": "Vue computed"
+	},
+	"Vue Watch": {
+		"prefix": "vwatch",
+		"body": [
+			"watch(",
+			"\t() => ${1:name},",
+			"\t() => {",
+			"\t\t${2}",
+			"\t}",
+			")"
+		],
+		"description": "Vue watcher"
+	},
+	"Vue Watch Effect": {
+		"prefix": "vwatcheffect",
+		"body": [
+			"watchEffect(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue Watch Effect"
+	},
+	"Vue Lifecycle Hooks - onMounted": {
+		"prefix": "vonmounted",
+		"body": [
+			"onMounted(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue onMounted Lifecycle hook"
+	},
+	"Vue Lifecycle Hooks - onBeforeMount": {
+		"prefix": "vonbeforemount",
+		"body": [
+			"onBeforeMount(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue onBeforeMount Lifecycle hook"
+	},
+	"Vue Lifecycle Hooks - onBeforeUpdate": {
+		"prefix": "vonbeforeupdate",
+		"body": [
+			"onBeforeUpdate(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue onBeforeUpdate Lifecycle hook"
+	},
+	"Vue Lifecycle Hooks - onUpdated": {
+		"prefix": "vonupdated",
+		"body": [
+			"onUpdated(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue onUpdated Lifecycle hook"
+	},
+	"Vue Lifecycle Hooks - onErrorCaptured": {
+		"prefix": "vonerrorcaptured",
+		"body": [
+			"onErrorCaptured(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue onErrorCaptured Lifecycle hook"
+	},
+	"Vue Lifecycle Hooks - onUnmounted": {
+		"prefix": "vonunmounted",
+		"body": [
+			"onUnmounted(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue onUnmounted Lifecycle hook"
+	},
+	"Vue Lifecycle Hooks - onBeforeUnmount": {
+		"prefix": "vonbeforeunmount",
+		"body": [
+			"onBeforeUnmount(() => {",
+			"\t${1}",
+			"})"
+		],
+		"description": "Vue onBeforeUnmount Lifecycle hook"
+	},
+	"Vue Define Props": {
+		"prefix": "vdefineprops",
+		"body": [
+			"defineProps<{",
+			"\t${1:name}: ${2:type}",
+			"}>()"
+		],
+		"description": "Vue defineProps"
+	},
+	"Vue Define Props with defaults": {
+		"prefix": "vdefineprops-withdefaults",
+		"body": [
+			"withDefaults(defineProps<{",
+			"\t${1:name}: ${2:type}",
+			"}>(), {",
+			"\t${1:name}: ${3:default}",
+			"})"
+		],
+		"description": "Vue withDefaults(defineProps)"
+	},
+	"Vue Define Emits": {
+		"prefix": "vdefineemits",
+		"body": [
+			"const emit = defineEmits<{",
+			"\t${1:eventName}: [${0}]",
+			"}>()"
+		],
+		"description": "Vue defineEmits"
+	},
+	"Vue Single Emit": {
+		"prefix": "vsingleemit",
+		"body": [
+			"${1:eventName}: [${0}]",
+		],
+		"description": "Vue single emit for defineEmits"
+	},
+	"Vue Define Slots": {
+		"prefix": "vdefineslots",
+		"body": [
+			"defineSlots<{",
+			"\tdefault: (props: { ${0} }) => any",
+			"}>()"
+		],
+		"description": "Vue defineSlots"
+	},
+	"Vue Single Slot": {
+		"prefix": "vsingleslot",
+		"body": [
+			"\t${1:slotName}: (props: { ${0} }) => any",
+		],
+		"description": "Vue single slot for defineSlots"
+	},
+	"Vue Define Options": {
+		"prefix": "vdefineoptions",
+		"body": [
+			"defineOptions({",
+			"\t${0}",
+			"})"
+		],
+		"description": "Vue defineOptions"
+	},
+	"Vue Define Model": {
+		"prefix": "vdefinemodel",
+		"body": [
+			"const modelValue = defineModel()",
+		],
+		"description": "Vue defineModel"
+	},
+	"Vue Style Binding Object": {
+		"prefix": "vstyle-obj",
+		"body": [
+			":style=\"[${2:styleObjectA}, ${3:styleObjectB]}\""
+		],
+		"description": "vue inline style binding, objects"
+	},
+	"Vue Class Binding": {
+		"prefix": "vclass",
+		"body": [
+			":class=\"{ '${2:classList}': ${1:condition} }\""
+		],
+		"description": "vue class binding"
+	},
+	"Vue Class Binding Ternary": {
+		"prefix": "vclass-ter",
+		"body": [
+			":class=\"[${1:condition} ? '${2:classListOnTrue}' : '${3:classListOnFalse}']\""
+		],
+		"description": "vue ternary class binding"
+	},
 }
-
-export = WindowCanvas
-export as namespace WindowCanvas
 ```
 
-```typescript
-<env.d.ts>
 
-/// <reference types="vite/client" />
+# git-commit-plugin
 
-declare module '*.vue' {
-  import { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
-  export default component
-}
 
-declare interface Window {
-  windowCanvas: WindowCanvas.CanvasInterface
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 插件
+
+[git-commit-plugin](https://marketplace.visualstudio.com/items?itemName=redjue.git-commit-plugin) 用于在提交时按步骤选择类型与说明，适合团队统一 commit 风格。
+
+<img alt="AhJindeg-1701079399727" src={__img0} placeholder="blur" />
+
+## 使用步骤
+
+### 第一步：选择提交
+
+<img alt="AhJindeg-1701079405956" src={__img1} placeholder="blur" />
+
+### 第二步：选择提交类型
+
+<img alt="AhJindeg-1701079412095" src={__img2} placeholder="blur" />
+
+### 第三步：进行 commit 填写
+
+<img alt="AhJindeg-1701079418474" src={__img3} placeholder="blur" />
+
+选择对应选项后按 Enter，依提示填写内容，可多次重复。
+
+<img alt="AhJindeg-1701079424922" src={__img4} placeholder="blur" />
+
+<img alt="AhJindeg-1701079430839" src={__img5} placeholder="blur" />
+
+### 第四步：完成并生成 commit 信息
+
+<img alt="AhJindeg-1701079437654" src={__img6} placeholder="blur" />
+
+
+# 驼峰翻译助手
+
+
+
+
+
+
+
+
+
+## 插件
+
+[Var Translation 驼峰翻译助手](https://marketplace.visualstudio.com/items?itemName=svenzhao.var-translation) 可将**中文**或**英文**一键转为常用的大小驼峰、下划线、常量等格式。
+
+也支持在英文间快速切换命名风格。
+
+<img alt="AhJindeg-1701078098855" src={__img0} placeholder="blur" />
+
+### 快捷键
+
+```text
+win: Alt+shift+t
+mac: cmd+shift+t
 ```
+
+<img alt="AhJindeg-1701078111443" src={__img1} placeholder="blur" />
+
+### 命令面板（Ctrl+Shift+P）
+
+<img alt="AhJindeg-1701078123349" src={__img2} placeholder="blur" />
+
+
+# 顶部浮动显示当前层级
+
+
+
+
+
+## 说明
+
+较新版本 VS Code 支持 **粘性滚动**（Sticky Scroll）：在编辑器中向下滚动时，在**顶部**固定显示当前所在的**类/函数/命名空间**层级，便于长文件内定位结构。
+
+```json
+"editor.experimental.stickyScroll.enabled": true
+```
+
+<img alt="AhJindeg-1701076874210" src={__img0} placeholder="blur" />
+
+
+# 紧凑形式呈现文件夹
+
+
+
+
+
+
+
+## 说明
+
+`explorer.compactFolders` 为 `true` 时，资源管理器以**紧凑**方式展示：当文件夹下**只有一个**子文件夹时，会把父子合并成**一层**路径显示。
+
+```json
+"explorer.compactFolders": false
+```
+
+### 开启紧凑（示例）
+
+<img alt="AhJindeg-1701156705523" src={__img0} placeholder="blur" />
+
+### 关闭紧凑（示例）
+
+<img alt="AhJindeg-1701156684507" src={__img1} placeholder="blur" />
 
 
 # 配置 prototype 防止往同一地址跳转时会报错的情况
 
 
 
-#### 修改 VueRouter 配置 prototype 防止往同一地址跳转时会报错的情况
+## 问题说明
 
-### router / index.js
+Vue Router 在重复导航到当前路由时，`push` / `replace` 可能 reject，在控制台或拦截器里产生噪音。可在创建路由实例前，对 `VueRouter.prototype` 做一层包装，把「重复导航」类错误消化掉。
+
+## 实现：router / index
 
 ```javascript
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-Vue.use(Router)
+Vue.use(VueRouter)
 
 const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location, onResolve, onReject) {
@@ -208,7 +707,7 @@ VueRouter.prototype.push = function push(location, onResolve, onReject) {
   return originalPush.call(this, location).catch((err) => err)
 }
 
-const originalReplace = VueRouter.prototype.receive
+const originalReplace = VueRouter.prototype.replace
 VueRouter.prototype.replace = function replace(location, onResolve, onReject) {
   if (onResolve || onReject)
     return originalReplace.call(this, location, onResolve, onReject)
@@ -216,15 +715,49 @@ VueRouter.prototype.replace = function replace(location, onResolve, onReject) {
 }
 ```
 
-
-# 关于在 VUE3 中样式穿透的小建议
-
+> 注：若使用 **Vue 3** + `createRouter`，更推荐在应用侧用 **导航守卫** 或 `router` 的 `isReady()`、全局错误处理；以上为 **Vue 2** 下常见改法。
 
 
-#### 使用 VUE3 项目后会因为使用的 CSS 预处理 不同导致`/deep/ & v-deep & >>>` 无效或者报错
+# 状态管理速查（ref 与 reactive）
 
-可以修改为使用 `:deep(.className)`
 
-设置 ***全局样式*** 使用 `:global(.className)`
 
-设置 ***插槽样式*** 使用 `:slotted(.className)`
+
+
+## 内容说明
+
+速查图对比 `ref()` 与 `reactive()`：声明方式、`.value` 解包、以及 `reactive` 的解构与整体替换等限制。Vue 推荐以 **`ref` 作为声明响应式状态的主要方式**。
+
+## 速查图
+
+<img alt="Vue.js 3 State Management：ref 与 reactive 对比速查" src={__img0} placeholder="blur" />
+
+*图源：@icarus\_gk*
+
+
+# 样式穿透
+
+
+
+## 问题说明
+
+使用 Vue 3 时，因 CSS 预处理器不同，`/deep/`、`::v-deep`、`>>>` 等可能失效或报警，可改用组合式 API 推荐的伪类选择器。
+
+## 推荐写法
+
+* **子组件/深层选择器**：使用 `:deep(.className)`。
+* **全局样式**：使用 `:global(.className)`。
+* **插槽内容样式**：使用 `:slotted(.className)`。
+
+
+# CRUD
+
+
+
+```vue
+<template>
+  <div>
+    <h1>Yudao UI CRUD</h1>
+  </div>
+</template>
+```
