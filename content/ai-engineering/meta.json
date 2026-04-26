@@ -1,0 +1,11 @@
+{
+  "title": "AI Engineering",
+  "root": true,
+  "pages": [
+    "index",
+    "foundations",
+    "agent-workflows",
+    "capability-library",
+    "evaluation-reliability"
+  ]
+}

@@ -34,6 +34,20 @@ export const blog = defineDocs({
   },
 });
 
+// AI Engineering collection 配置
+export const aiEngineering = defineDocs({
+  dir: 'content/ai-engineering',
+  docs: {
+    schema: frontmatterSchema,
+    postprocess: {
+      includeProcessedMarkdown: true,
+    },
+  },
+  meta: {
+    schema: metaSchema,
+  },
+});
+
 export default defineConfig({
   mdxOptions: {
     // MDX options
