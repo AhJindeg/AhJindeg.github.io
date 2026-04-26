@@ -1,5 +1,6 @@
 {
   "title": "Vue",
+  "description": "The Progressive JavaScript Framework. An approachable, performant and versatile framework for building web user interfaces.",
   "root": true,
   "pages": [
     "---Vue 3---",

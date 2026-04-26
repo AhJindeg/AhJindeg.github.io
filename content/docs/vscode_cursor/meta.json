@@ -1,5 +1,6 @@
 {
   "title": "VSCode & Cursor",
+  "description": "Visual Studio Code combines the simplicity of a code editor with what developers need for their core edit-build-debug cycle.",
   "root": true,
   "pages": [
     "---Settings---",
