@@ -1,0 +1,17 @@
+---
+title: 关于在 VUE3 中样式穿透的小建议
+description: 使用 :deep、:global、:slotted 替代 /deep/、>>> 等写法
+date: 2023/11/27
+categories:
+  - vue/vue3
+---
+
+## 问题说明
+
+使用 Vue 3 时，因 CSS 预处理器不同，`/deep/`、`::v-deep`、`>>>` 等可能失效或报警，可改用组合式 API 推荐的伪类选择器。
+
+## 推荐写法
+
+- **子组件/深层选择器**：使用 `:deep(.className)`。
+- **全局样式**：使用 `:global(.className)`。
+- **插槽内容样式**：使用 `:slotted(.className)`。

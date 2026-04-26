@@ -14,7 +14,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
           children: (
             <NavbarMenu>
               <NavbarMenuTrigger>
-                <Link href="/docs">Docs</Link>
+                <Link href="/docs">Documentation</Link>
               </NavbarMenuTrigger>
             </NavbarMenu>
           ),

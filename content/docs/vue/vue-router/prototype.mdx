@@ -1,19 +1,22 @@
 ---
 title: 配置 prototype 防止往同一地址跳转时会报错的情况
+description: Vue 2 下通过包装 VueRouter.prototype.push 与 replace 消化重复导航
 date: 2023/11/27
 categories:
   - vue/vue-router
 ---
 
-#### 修改 VueRouter 配置 prototype 防止往同一地址跳转时会报错的情况
+## 问题说明
 
-### router / index.js
+Vue Router 在重复导航到当前路由时，`push` / `replace` 可能 reject，在控制台或拦截器里产生噪音。可在创建路由实例前，对 `VueRouter.prototype` 做一层包装，把「重复导航」类错误消化掉。
+
+## 实现：router / index
 
 ```javascript
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-Vue.use(Router)
+Vue.use(VueRouter)
 
 const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location, onResolve, onReject) {
@@ -22,10 +25,12 @@ VueRouter.prototype.push = function push(location, onResolve, onReject) {
   return originalPush.call(this, location).catch((err) => err)
 }
 
-const originalReplace = VueRouter.prototype.receive
+const originalReplace = VueRouter.prototype.replace
 VueRouter.prototype.replace = function replace(location, onResolve, onReject) {
   if (onResolve || onReject)
     return originalReplace.call(this, location, onResolve, onReject)
   return originalReplace.call(this, location).catch((err) => err)
 }
 ```
+
+> 注：若使用 **Vue 3** + `createRouter`，更推荐在应用侧用 **导航守卫** 或 `router` 的 `isReady()`、全局错误处理；以上为 **Vue 2** 下常见改法。

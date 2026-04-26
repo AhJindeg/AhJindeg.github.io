@@ -1,13 +1,16 @@
 ---
 title: 给 Window 增加自定义属性声明
+description: 在 .d.ts 中为 Window 扩展字段，以及通过 namespace 引用已声明类型
 date: 2023/11/27
 categories:
   - typescript/declare
 ---
 
-## 给 Window 增加一个简单的类型声明
+## 简单声明
 
-创建一个 `xxx.d.ts` 文件，使用 `declare` 声明类型 <注意：此文件中不可以具有 `import` 等导入方法>
+在独立声明文件中扩展 `Window`，注意该文件内不要写 `import`，否则会变成模块、可能无法作为全局 augment 使用（见下一节做法）。
+
+创建 `xxx.d.ts`，用 `declare` 补全类型。**注意：此文件内不要使用 `import` / `export`，否则会被视为模块，全局 `Window` 扩展可能不生效。**
 
 ```typescript
 <env.d.ts>
@@ -29,11 +32,11 @@ declare interface Window {
 }
 ```
 
-## 给 Window 增加一个复杂的类型声明
+## 复杂声明：命名空间与可 import 的类型
 
-因为在声明文件中使用 `import` 会导致被当作一个模块导致类型声明失效，如果我们要给 Window 增加一个已经声明好的类型就需要先创建一个文件用于定义全局命名空间，我们可以在命名空间中引入类型
+若需在 `Window` 上挂载**来自其他模块**的类型，单独一个无 `import` 的全局 `.d.ts` 往往不够；可先建命名空间文件，再在另一份 `env.d.ts` 里合并到 `Window`。
 
-创建 `xxx.d.ts` 文件 -> 创建命名空间 -> 在 Window 声明文件中使用命名空间定义的类型
+流程概览：新建 `window.d.ts`（namespace + 可 `import`）→ 在仅 `declare` 的 `env.d.ts` 里引用该命名空间类型。
 
 ```typescript
 <window.d.ts>
