@@ -9,72 +9,530 @@
 内容不追求全面，只求看了之后真的能用上。
 
 
-# 给 Window 增加自定义属性声明
+# Introduction
 
 
 
-## 简单声明
+AI Engineering 不是“能调通一次”，而是把 AI 能力做成可持续交付的系统工程。\
+核心目标有三个：
 
-在独立声明文件中扩展 `Window`，注意该文件内不要写 `import`，否则会变成模块、可能无法作为全局 augment 使用（见下一节做法）。
+* 能力可复现：同类输入在不同时间和环境下保持稳定质量；
+* 成本可控制：精度、延迟、预算三者可量化权衡；
+* 风险可治理：上线前能发现回归，上线后能快速定位问题。
 
-创建 `xxx.d.ts`，用 `declare` 补全类型。**注意：此文件内不要使用 `import` / `export`，否则会被视为模块，全局 `Window` 扩展可能不生效。**
+本模块按完整交付链路拆成四个方向：
 
-```typescript
-<env.d.ts>
+* Foundations：理解模型边界、上下文约束、检索与表示学习的底层机制；
+* Agent Workflows：把复杂任务拆成可执行、可交接、可回滚的流程；
+* Capability Library：将经验沉淀成模板、模式与可复用能力资产；
+* Evaluation & Reliability：用评测与门禁防止“看起来更好、实际变差”。
 
-/// <reference types="vite/client" />
+## 一个常见误区
 
-declare module '*.vue' {
-  import { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
-  export default component
-}
+很多团队把 Prompt 当成唯一优化点，结果每次改动都靠“感觉更好”。\
+更稳健的方式是：先约束输入边界和数据质量，再优化 Prompt，最后用评测验证收益。
 
-declare interface Window {
-  canvas: {
-    e: boolean[],
-    x: number,
-    y: string
-  }
-}
-```
 
-## 复杂声明：命名空间与可 import 的类型
+# Introduction
 
-若需在 `Window` 上挂载**来自其他模块**的类型，单独一个无 `import` 的全局 `.d.ts` 往往不够；可先建命名空间文件，再在另一份 `env.d.ts` 里合并到 `Window`。
 
-流程概览：新建 `window.d.ts`（namespace + 可 `import`）→ 在仅 `declare` 的 `env.d.ts` 里引用该命名空间类型。
 
-```typescript
-<window.d.ts>
+这一部分关注“如何复用”：把个人经验转成团队可共享、可审查、可迭代的资产。\
+目标不是“积累文档”，而是“沉淀可执行能力”。
 
-import { CanvasPlus, Canvas } from '@/declare'
+## 能力资产分层
 
-declare namespace WindowCanvas {
-  interface CanvasInterface extends Canvas {
-    canvas: CanvasPlus
-  }
-}
+* Prompt Pattern：针对任务类型的提示模式；
+* Skill Template：带输入/输出契约的执行模板；
+* Playbook：面向场景的完整操作流程；
+* Guardrail Policy：合规、权限、风险边界规则。
 
-export = WindowCanvas
-export as namespace WindowCanvas
-```
+## 建设原则
 
-```typescript
-<env.d.ts>
+1. 资产必须可被检索：标签、场景、版本信息完整；
+2. 资产必须可被验证：有示例输入、预期输出和失败信号；
+3. 资产必须可被演进：版本变更可追踪，过期资产可下线。
 
-/// <reference types="vite/client" />
+## 常见误区
 
-declare module '*.vue' {
-  import { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
-  export default component
-}
+* 只收藏“好 Prompt”，不定义适用边界；
+* 只写模板，不沉淀失败案例与禁用场景；
+* 版本漂移后不回收旧模板，导致协作结果不一致。
 
-declare interface Window {
-  windowCanvas: WindowCanvas.CanvasInterface
-}
-```
+
+# Prompt 模式目录
+
+
+
+## 1) 为什么要目录化
+
+Prompt 资产化的核心价值是“可复用”和“可治理”。\
+如果只靠个人记忆，同样任务会反复重写、质量波动很大。
+
+## 2) 推荐分类维度
+
+* 任务类型：信息抽取、结构化生成、代码修改、审查对比；
+* 风险等级：低风险自动化 / 中风险复核 / 高风险人工审批；
+* 输出契约：文本、JSON、Patch、Checklist 等；
+* 失败特征：幻觉、遗漏、格式错误、越权动作。
+
+## 3) 每个模式必须包含的字段
+
+* 场景定义：适用于什么问题，不适用于什么问题；
+* 输入前提：必须提供哪些上下文；
+* 执行指令：步骤和约束要可执行；
+* 输出规范：格式、长度、字段、禁止项；
+* 失败信号：什么现象代表这次结果不可用；
+* 样例：最小输入样例与标准输出样例。
+
+## 4) 质量治理建议
+
+1. 建立版本号与变更日志（为什么改、改了什么）；
+2. 对高频模式做 A/B 对比，保留胜出版本；
+3. 定期清理低命中、低收益模式，避免目录膨胀；
+4. 将“失败案例”纳入目录，形成负面样本库。
+
+## 5) 反模式
+
+* 只收藏“通用万能 Prompt”；
+* 没有输出契约，导致结果不可自动消费；
+* 只写成功案例，不记录失败条件与禁用边界。
+
+
+# Skill 模板设计
+
+
+
+## 1) Skill Template 的定位
+
+Skill Template 是“可执行接口”，不是“经验笔记”。\
+它要把能力边界、输入输出契约和失败处理讲清楚，保证不同执行者得到一致结果。
+
+## 2) 设计目标
+
+* 快速上手：新成员可直接调用；
+* 边界清晰：适用/不适用场景明确；
+* 可审查：执行步骤可追溯；
+* 可演进：版本升级不破坏调用方。
+
+## 3) 建议字段（推荐最小集）
+
+* 场景定义：目标、前提、约束；
+* 输入要求：必填字段、可选字段、默认值；
+* 执行步骤：可按序执行的动作；
+* 输出规范：格式、字段、错误码；
+* 失败处理：重试策略、降级策略、人工介入条件；
+* 安全边界：权限限制、敏感操作白名单/黑名单；
+* 版本信息：兼容性说明与变更记录。
+
+## 4) 演进策略
+
+1. 语义化版本：`major.minor.patch`；
+2. 向后兼容优先：新增字段优先，不随意改语义；
+3. 灰度发布：先小流量验证，再全量替换；
+4. 弃用机制：标记 deprecated 并提供迁移路径。
+
+## 5) 反模式
+
+* 模板只写“做什么”，不写“怎么判定完成”；
+* 输出无结构，无法接入自动化流程；
+* 没有错误策略，失败后只能人工兜底。
+
+
+# Harness 基线设计
+
+
+
+## 1) Harness 解决什么问题
+
+Harness 用于回答一个核心问题：\
+这次改动是“真实提升”，还是“样例碰巧更好”。
+
+## 2) 评测集设计原则
+
+* 覆盖面：高频场景 + 高风险场景 + 长尾场景；
+* 分层：冒烟集（快）、回归集（稳）、完整集（全）；
+* 可追溯：每条样本有来源、标签、评分依据；
+* 可演进：定期剔除过期样本并补充新故障样本。
+
+## 3) 指标体系建议
+
+* 正确性：任务完成率、结构化输出合法率；
+* 可靠性：失败率、重试成功率、结果一致性；
+* 经济性：平均成本、P95 成本、缓存命中收益；
+* 性能：P50/P95 时延、超时率、队列堆积。
+
+## 4) 固定实验条件
+
+为保证可比性，至少固定以下变量：
+
+* 模型版本与关键参数；
+* 检索索引快照与配置；
+* Prompt 模板版本；
+* 工具调用策略与超时阈值。
+
+## 5) 输出物建议
+
+每次评测都应产出：
+
+* 汇总报告（核心指标变化）；
+* 差异样本列表（变好/变差案例）；
+* 结论建议（可发布 / 需复核 / 阻断发布）。
+
+## 6) 常见反模式
+
+* 只保留“最终分数”，不保留样本证据；
+* 每次改动都换评测集，无法横向比较；
+* 不区分失败严重度，导致高风险问题被平均分掩盖。
+
+
+# Introduction
+
+
+
+这一部分关注“如何证明可用”，把“主观觉得不错”变成“指标可验证”。\
+评测的价值不在打分本身，而在为发布决策提供证据。
+
+## 可靠性工程的三层闭环
+
+* 事前：基线构建（Harness）与任务集治理；
+* 事中：回归门禁（Regression Gate）阻断退化；
+* 事后：线上观测、故障复盘、数据反哺评测集。
+
+## 必看的核心指标
+
+* 质量：正确率、拒答率、引用准确率；
+* 效率：端到端时延、吞吐、超时率；
+* 成本：单请求成本、峰值预算、资源占用；
+* 稳定性：波动区间、长尾失败率、版本漂移。
+
+## 常见误区
+
+* 只做离线评测，不追线上反馈；
+* 只看平均分，不看长尾和严重错误；
+* 只评功能正确，不评成本与时延。
+
+
+# Regression Gate 策略
+
+
+
+## 1) Regression Gate 的定位
+
+Regression Gate 是发布前的硬门禁。\
+目标不是追求“全指标最优”，而是阻止明显退化进入生产环境。
+
+## 2) 门禁分层（建议）
+
+* **L1 自动门禁（必须通过）**\
+  关键场景通过率不低于基线；严重错误不得上升。
+
+* **L2 经济门禁（需满足预算）**\
+  成本、时延、资源消耗在目标阈值内。
+
+* **L3 业务门禁（人工复核）**\
+  关键路径样本人工抽检通过，引用与结论一致。
+
+## 3) 阈值设计方法
+
+1. 先定义“不可退化指标”（如严重错误数）；
+2. 再定义“可波动指标”（如平均时延）；
+3. 最后给出波动区间（如 ±3%）和例外处理流程。
+
+## 4) 例外处理与回滚
+
+* 例外必须记录：审批人、原因、影响范围、失效时间；
+* 上线后触发红线要自动告警并进入回滚流程；
+* 回滚后要把故障样本纳入回归集，避免重复发生。
+
+## 5) 常见反模式
+
+* 把门禁当作“形式化步骤”，阈值长期无人维护；
+* 只看一次通过，不追踪发布后漂移；
+* 例外开口太大，最终门禁失效。
+
+
+# Embedding 与切块策略
+
+
+
+## 1) 问题定义
+
+Embedding 与 Chunking 的目标不是“把文档切碎”，而是让检索系统能稳定找回**可回答问题的证据单元**。\
+检索质量差时，继续调 Prompt 往往只能掩盖问题，不能解决问题。
+
+## 2) Chunking 设计原则
+
+* 语义完整优先：按标题、段落、步骤、表格边界切分；
+* 单块单主题：一个 chunk 最好只服务一个检索意图；
+* 适度重叠：降低边界信息断裂，避免答案“差最后一句”；
+* 元数据外置：来源、版本、更新时间、权限标签要结构化存储。
+
+## 3) Embedding 选型与索引要点
+
+* 模型选型优先看领域匹配，而不是只看通用榜单分数；
+* 索引设计要考虑过滤条件（租户、权限、时间）；
+* 混合检索（关键词 + 向量）通常比纯向量更稳健；
+* 重排（rerank）应聚焦“前 k 条质量”，而非全量排序精度。
+
+## 4) 评估指标（建议同时看离线与在线）
+
+* 命中率（Hit\@k）：正确证据是否进入候选集合；
+* 覆盖率（Coverage）：复杂问题所需证据是否齐全；
+* 噪声率（Noise）：无关 chunk 占比是否过高；
+* 证据密度：最终输入给模型的上下文中有效信息占比。
+
+## 5) 常见失败模式
+
+* **按固定字符切块**：跨段断裂，关键前提和结论被拆开；
+* **元数据缺失**：召回出来但无法过滤过期或低可信来源；
+* **只做向量检索**：对精确术语、配置项、错误码召回不稳定。
+
+## 6) 落地建议
+
+1. 先用 50\~100 个真实问题做离线标注集；
+2. 每次只改一个变量（切块大小、重叠、检索 k、重排模型）；
+3. 记录“检索结果 + 最终回答”，定位问题在检索还是生成；
+4. 设立回归阈值，避免优化 A 场景却破坏 B 场景。
+
+
+# Introduction
+
+
+
+这一部分回答“为什么这样做”，用于建立 AI 系统设计的底层判断标准。\
+如果没有 Foundations，后面的流程与工具往往只能靠试错堆出来。
+
+## 本模块覆盖的核心问题
+
+* 模型边界：模型擅长什么、不擅长什么，哪些问题应交给外部系统；
+* 上下文治理：在有限窗口内如何安排指令、证据与历史；
+* 语义检索：如何把知识库转成“可被正确召回”的结构；
+* RAG 架构：如何在准确性、成本、时延之间做可解释的取舍。
+
+## 关键设计原则
+
+1. 把“猜测”变成“证据”：优先给模型可验证上下文，而不是更长提示词；
+2. 把“能力”拆成“链路”：召回、重排、生成、校验分层设计；
+3. 把“效果”落到“指标”：准确率、拒答率、引用质量、延迟与成本同时跟踪。
+
+## 常见反模式
+
+* 只看最终回答，不看检索命中与证据覆盖；
+* 只调 Prompt，不管理知识源质量与更新时效；
+* 只追求通过率，不治理长尾错误与失败类型分布。
+
+
+# Context Window 设计
+
+
+
+## 1) 问题定义：Context Window 不是“容量”，而是“约束系统”
+
+Context Window 不只是 token 上限，更是指令优先级、注意力分配和成本结构的综合约束。\
+超限不是唯一问题，常见情况是“未超限但质量退化”，例如指令被稀释、关键信息埋在中段（lost-in-the-middle）。
+
+## 2) 设计目标：把 token 当预算来管理
+
+* 保留“不可丢信息”：系统指令、任务目标、强约束条件；
+* 控制“高变信息”：用户上下文、检索片段、临时中间结果；
+* 压缩“低价值信息”：冗余对话历史、重复日志、无效失败尝试。
+
+## 3) 实践策略
+
+### 指令分层
+
+* 系统层：角色、边界、输出格式、禁止项；
+* 任务层：当前目标、输入摘要、验收标准；
+* 证据层：检索结果、日志片段、结构化数据。
+
+### 历史管理
+
+* 对话历史采用“滚动摘要 + 关键锚点”而非全文回放；
+* 对失败尝试只保留“失败原因 + 不可行路径”，减少重复踩坑；
+* 明确历史有效期，过期信息进入归档，不再默认注入。
+
+### 预算配比（可作为初始模板）
+
+* 15%：系统与约束；
+* 25%：当前任务与验收标准；
+* 45%：证据与检索片段；
+* 15%：中间推理与输出缓冲。
+
+## 4) 失败模式与修复
+
+* **症状：答非所问**\
+  原因：同一轮混入多个目标。\
+  修复：任务切片，一轮只验证一个结果。
+
+* **症状：格式正确但事实错误**\
+  原因：证据不足或证据冲突。\
+  修复：先做证据筛选与来源排序，再生成答案。
+
+* **症状：偶发退化、难复现**\
+  原因：上下文注入顺序不稳定。\
+  修复：固定模板顺序，关键字段结构化。
+
+## 5) 落地检查清单
+
+* 是否定义了 token 预算和注入优先级；
+* 是否有历史摘要策略与过期清理策略；
+* 是否能在日志中复原“当次输入上下文”；
+* 是否对超长输入提供降级路径（摘要、分段、拒答）。
+
+
+# RAG 设计模式
+
+
+
+## 1) RAG 的本质
+
+RAG 本质是把“生成问题”拆成“检索问题 + 生成问题”。\
+系统质量上限通常由检索质量决定，下限由生成约束决定。
+
+## 2) 基础链路（最小可用）
+
+1. Query 规范化：补全上下文、提取关键词、识别意图；
+2. Candidate Retrieval：多路召回（关键词 + 向量）；
+3. Re-ranking：按相关性、时效、可信度重排；
+4. Grounded Generation：仅基于证据生成；
+5. 引用回传：给出来源信息用于追溯。
+
+## 3) 常见架构模式
+
+* **Single-shot RAG**：适合问答直接命中场景，延迟低；
+* **Iterative RAG**：先回答再补检索，适合复杂问题；
+* **Router RAG**：按意图路由到不同知识库；
+* **Hybrid RAG**：结构化数据查询 + 文档检索联合。
+
+## 4) 关键设计权衡
+
+* 召回深度 vs 延迟：k 越大不一定越准，噪声会升高；
+* 引用充分 vs 可读性：引用太多影响回答可读体验；
+* 严格证据约束 vs 回答完整性：证据不足时应优先拒答或追问。
+
+## 5) 可靠性增强点
+
+* 检索前过滤：权限、时间、来源白名单；
+* 生成前校验：证据是否覆盖问题关键维度；
+* 生成后审查：检测幻觉、引用缺失、断章取义；
+* 不足时降级：明确“无足够证据”，不要硬答。
+
+## 6) 反模式
+
+* “检索只是装饰”：检索结果未真正参与生成；
+* “引用不可追溯”：只贴链接不贴证据片段；
+* “离线分数很好，线上投诉高”：评测集与真实流量脱节。
+
+
+# Context Handoff 规范
+
+
+
+## 1) 为什么交接是工程能力
+
+在多代理、多阶段协作中，交接质量直接决定后续效率。\
+低质量交接会导致三件事：重复排查、错误延续、决策断层。
+
+## 2) 交接最小信息集（必须包含）
+
+* 当前目标与阶段结论（结论要可执行）；
+* 已验证事实与未验证假设（明确置信度）；
+* 已修改文件、影响范围与潜在副作用；
+* 失败尝试与失败原因（防止重复踩坑）；
+* 下一步建议与风险提示（含优先级）。
+
+## 3) 交接格式建议
+
+推荐固定模板，减少信息遗漏：
+
+1. 背景：当前处于哪一阶段；
+2. 结果：本阶段产出与验证结果；
+3. 证据：关键命令输出、文件变更、关键日志；
+4. 风险：潜在回归点与注意事项；
+5. Next Action：下一执行者可直接开始的动作。
+
+## 4) 质量评估维度
+
+* 完整性：必要字段是否齐全；
+* 可执行性：下一位是否能直接开始；
+* 可追溯性：结论是否能回到证据；
+* 经济性：信息不过载，重点明确。
+
+## 5) 常见反模式
+
+* 只有“改完了”没有验证依据；
+* 只有“现象”没有“约束条件”；
+* 省略失败路径，导致团队重复走弯路。
+
+
+# Introduction
+
+
+
+这一部分关注“怎么做得稳”，即把 AI 任务从“对话行为”升级为“工程流程”。\
+核心不是让 Agent 更聪明，而是让流程更可控。
+
+## 三个关键问题
+
+* 怎么拆：复杂需求如何拆成可并行、可验证、可回滚的单元；
+* 怎么接：上下游如何交接信息，避免重复探索与上下文丢失；
+* 怎么收：如何定义完成标准、异常处理与回滚路径。
+
+## 推荐流程骨架
+
+1. 任务建模：目标、输入边界、约束、验收标准；
+2. 执行编排：顺序/并行、依赖关系、失败重试策略；
+3. 结果审查：功能正确性、风险检查、日志留痕；
+4. 收尾交接：结论、证据、未解问题、下一步建议。
+
+## 缺失但关键的概念（已补充到子文档）
+
+* 流程状态机（Pending/In Progress/Blocked/Done）；
+* 失败分级（可重试 / 需人工介入 / 必须终止）；
+* 交接质量评分（完整性、可执行性、可追溯性）。
+
+
+# Task Decomposition 方法
+
+
+
+## 1) 为什么拆解决定上限
+
+复杂任务失败的根因，通常不是模型能力不足，而是任务定义模糊。\
+高质量拆解能显著降低返工、误改和上下文污染。
+
+## 2) 拆解原则
+
+* 单任务单目标：每个任务只产出一个可验证结果；
+* 低耦合：任务之间不共享隐式状态，输入显式声明；
+* 先验收后执行：先写完成条件，再做改动；
+* 可回滚：每个任务都能独立撤销，不影响全局。
+
+## 3) 任务描述模板（建议）
+
+1. 目标：解决什么问题，影响范围是什么；
+2. 输入：允许访问的数据、文件、工具边界；
+3. 动作：新增/修改/删除哪些内容；
+4. 验收：如何通过命令、测试、人工审查验证；
+5. 风险：可能误伤点与兜底方案。
+
+## 4) 状态机与调度
+
+推荐把任务状态明确为：
+
+* Pending：待执行；
+* In Progress：执行中；
+* Blocked：被依赖或异常阻塞；
+* Done：已验证完成。
+
+遇到 Blocked 时，优先输出“阻塞原因 + 建议下一步”，而不是继续盲试。
+
+## 5) 反模式
+
+* 用“修一下这里”这类模糊描述直接执行；
+* 把探索、实现、验证混在一个任务里；
+* 只给结论，不保留中间证据与决策理由。
 
 
 # 序列化与反序列化
@@ -190,6 +648,180 @@ JSON.parse(user, (key, value) => {
     if (key === 'password') return;
     return value;
 })
+```
+
+
+# 配置 prototype 防止往同一地址跳转时会报错的情况
+
+
+
+## 问题说明
+
+Vue Router 在重复导航到当前路由时，`push` / `replace` 可能 reject，在控制台或拦截器里产生噪音。可在创建路由实例前，对 `VueRouter.prototype` 做一层包装，把「重复导航」类错误消化掉。
+
+## 实现：router / index
+
+```javascript
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+
+Vue.use(VueRouter)
+
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location, onResolve, onReject) {
+  if (onResolve || onReject)
+    return originalPush.call(this, location, onResolve, onReject)
+  return originalPush.call(this, location).catch((err) => err)
+}
+
+const originalReplace = VueRouter.prototype.replace
+VueRouter.prototype.replace = function replace(location, onResolve, onReject) {
+  if (onResolve || onReject)
+    return originalReplace.call(this, location, onResolve, onReject)
+  return originalReplace.call(this, location).catch((err) => err)
+}
+```
+
+> 注：若使用 **Vue 3** + `createRouter`，更推荐在应用侧用 **导航守卫** 或 `router` 的 `isReady()`、全局错误处理；以上为 **Vue 2** 下常见改法。
+
+
+# Vue 3 速查图解
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 速查图：`ref()` 与 `reactive()`
+
+速查图对比 `ref()` 与 `reactive()`：声明方式、`.value` 解包、以及 `reactive` 的解构与整体替换等限制。Vue 推荐以 **`ref` 作为声明响应式状态的主要方式**。
+
+<img alt="Vue.js 3 State Management：ref 与 reactive 对比速查" src={__img0} placeholder="blur" />
+
+*图源：@icarus\_gk*
+
+## Vue 系列分图（PNG）
+
+同一套内容的拆分大图，可按顺序查阅；在窄屏上比单张长图更易缩放阅读。
+
+### 学前了解
+
+<img alt="Vue 3 状态管理：学前了解" src={__img1} placeholder="blur" />
+
+### 基础知识
+
+<img alt="Vue 3 状态管理：基础知识" src={__img2} placeholder="blur" />
+
+### 组件相关语法
+
+<img alt="Vue 3 状态管理：组件相关语法" src={__img3} placeholder="blur" />
+
+### 高级语法（一）
+
+<img alt="Vue 3 状态管理：高级语法（一）" src={__img4} placeholder="blur" />
+
+### 高级语法（二）
+
+<img alt="Vue 3 状态管理：高级语法（二）" src={__img5} placeholder="blur" />
+
+### 配套工具
+
+<img alt="Vue 3 状态管理：配套工具" src={__img6} placeholder="blur" />
+
+*图源：@jspang*
+
+
+# 样式穿透
+
+
+
+## 问题说明
+
+使用 Vue 3 时，因 CSS 预处理器不同，`/deep/`、`::v-deep`、`>>>` 等可能失效或报警，可改用组合式 API 推荐的伪类选择器。
+
+## 推荐写法
+
+* **子组件/深层选择器**：使用 `:deep(.className)`。
+* **全局样式**：使用 `:global(.className)`。
+* **插槽内容样式**：使用 `:slotted(.className)`。
+
+
+# 给 Window 增加自定义属性声明
+
+
+
+## 简单声明
+
+在独立声明文件中扩展 `Window`，注意该文件内不要写 `import`，否则会变成模块、可能无法作为全局 augment 使用（见下一节做法）。
+
+创建 `xxx.d.ts`，用 `declare` 补全类型。**注意：此文件内不要使用 `import` / `export`，否则会被视为模块，全局 `Window` 扩展可能不生效。**
+
+```typescript
+<env.d.ts>
+
+/// <reference types="vite/client" />
+
+declare module '*.vue' {
+  import { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}
+
+declare interface Window {
+  canvas: {
+    e: boolean[],
+    x: number,
+    y: string
+  }
+}
+```
+
+## 复杂声明：命名空间与可 import 的类型
+
+若需在 `Window` 上挂载**来自其他模块**的类型，单独一个无 `import` 的全局 `.d.ts` 往往不够；可先建命名空间文件，再在另一份 `env.d.ts` 里合并到 `Window`。
+
+流程概览：新建 `window.d.ts`（namespace + 可 `import`）→ 在仅 `declare` 的 `env.d.ts` 里引用该命名空间类型。
+
+```typescript
+<window.d.ts>
+
+import { CanvasPlus, Canvas } from '@/declare'
+
+declare namespace WindowCanvas {
+  interface CanvasInterface extends Canvas {
+    canvas: CanvasPlus
+  }
+}
+
+export = WindowCanvas
+export as namespace WindowCanvas
+```
+
+```typescript
+<env.d.ts>
+
+/// <reference types="vite/client" />
+
+declare module '*.vue' {
+  import { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}
+
+declare interface Window {
+  windowCanvas: WindowCanvas.CanvasInterface
+}
 ```
 
 
@@ -517,544 +1149,3 @@ ipconfig /flushdns
 ```powershell
 ipconfig /renew
 ```
-
-
-# git-commit-plugin
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## 插件
-
-[git-commit-plugin](https://marketplace.visualstudio.com/items?itemName=redjue.git-commit-plugin) 用于在提交时按步骤选择类型与说明，适合团队统一 commit 风格。
-
-<img alt="AhJindeg-1701079399727" src={__img0} placeholder="blur" />
-
-## 使用步骤
-
-### 第一步：选择提交
-
-<img alt="AhJindeg-1701079405956" src={__img1} placeholder="blur" />
-
-### 第二步：选择提交类型
-
-<img alt="AhJindeg-1701079412095" src={__img2} placeholder="blur" />
-
-### 第三步：进行 commit 填写
-
-<img alt="AhJindeg-1701079418474" src={__img3} placeholder="blur" />
-
-选择对应选项后按 Enter，依提示填写内容，可多次重复。
-
-<img alt="AhJindeg-1701079424922" src={__img4} placeholder="blur" />
-
-<img alt="AhJindeg-1701079430839" src={__img5} placeholder="blur" />
-
-### 第四步：完成并生成 commit 信息
-
-<img alt="AhJindeg-1701079437654" src={__img6} placeholder="blur" />
-
-
-# 驼峰翻译助手
-
-
-
-
-
-
-
-
-
-## 插件
-
-[Var Translation 驼峰翻译助手](https://marketplace.visualstudio.com/items?itemName=svenzhao.var-translation) 可将**中文**或**英文**一键转为常用的大小驼峰、下划线、常量等格式。
-
-也支持在英文间快速切换命名风格。
-
-<img alt="AhJindeg-1701078098855" src={__img0} placeholder="blur" />
-
-### 快捷键
-
-```text
-win: Alt+shift+t
-mac: cmd+shift+t
-```
-
-<img alt="AhJindeg-1701078111443" src={__img1} placeholder="blur" />
-
-### 命令面板（Ctrl+Shift+P）
-
-<img alt="AhJindeg-1701078123349" src={__img2} placeholder="blur" />
-
-
-# 常用log 代码片段
-
-
-
-## 片段
-
-将以下 JSON 合并进 VS Code **用户代码片段**（`javascript.json` 或 `*.code-snippets`）后，可用前缀 `consolelog` / `consoletable` / `consoledir` 快速插入。
-
-```json
-{
-  "Console Log": {
-    "body": [
-      "console.log(`%c$TM_FILENAME:%c$TM_LINE_NUMBER: `, `color: ${9:green};`,`color: ${10:red};`, {",
-      " ${1} ",
-      "})"
-    ],
-    "description": "Console Log",
-    "prefix": "consolelog",
-  },
-  "Console Table": {
-    "body": [
-      "console.table(${1}, [${2}])"
-    ],
-    "description": "Console Table",
-    "prefix": "consoletable",
-  },
-  "Console Dir": {
-    "body": [
-      "console.dir(${1}, { depth: ${2:2} })"
-    ],
-    "description": "Console Dir",
-    "prefix": "consoledir",
-  },
-}
-```
-
-
-# .gitignore 代码片段
-
-
-
-## 片段
-
-前缀 `gitignore` 展开为常用忽略项（含 `!pnpm-lock.yaml` 等）。
-
-```json
-{
-  "Gitignore": {
-    "prefix": "gitignore",
-    "body": [
-      "*.DS_Store",
-      ".idea/",
-      "",
-      "node_modules",
-      "dist-ssr",
-      "dist",
-      "",
-      "*.local",
-      "*-lock.*",
-      "!pnpm-lock.yaml",
-      "*.lock",
-      "*.log",
-      "",
-      "auto-*.d.ts",
-    ],
-    "description": "gitignore file"
-  }
-}
-```
-
-
-# vue3 代码片段
-
-
-
-## 片段
-
-以下为 Vue 3 + `<script setup>` + TypeScript 常用片段，按需合并到用户片段文件。
-
-```json
-{
-	"Vue Single File Template": {
-		"prefix": "vbase",
-		"body": [
-			"<script setup lang=\"ts\">",
-			"",
-			"</script>",
-			"",
-			"<template>",
-			"",
-			"</template>",
-			"",
-			"<style lang=\"scss\" scoped>",
-			"",
-			"</style>"
-		],
-		"description": "Vue Single File Template"
-	},
-	"Vue Script Element": {
-		"prefix": "vscript",
-		"body": [
-			"<script setup lang=\"ts\">",
-			"",
-			"</script>",
-		],
-		"description": "Vue Script Element"
-	},
-	"Vue Template Element": {
-		"prefix": "vtemplate",
-		"body": [
-			"<template>",
-			"",
-			"</template>",
-		],
-		"description": "Vue Template Element"
-	},
-	"Vue Style Element": {
-		"prefix": "vstyle",
-		"body": [
-			"<style lang=\"scss\" scoped>",
-			"",
-			"</style>"
-		],
-		"description": "Vue Style Element"
-	},
-	"Vue Transition": {
-		"prefix": "vtrans",
-		"body": [
-			"<Transition name=\"${1:transitionName}\">",
-			"\t${0}",
-			"</Transition>"
-		],
-		"description": "vue transition component"
-	},
-	"Vue Transition Group": {
-		"prefix": "vtrans-group",
-		"body": [
-			"<TransitionGroup name=\"${1:transitionName}\">",
-			"\t${0}",
-			"</TransitionGroup>"
-		],
-		"description": "vue transition group component"
-	},
-	"Vue Ref": {
-		"prefix": "vref",
-		"body": [
-			"const ${1:name} = ref(${2:initialValue})"
-		],
-		"description": "Vue Ref"
-	},
-	"Vue Ref typed": {
-		"prefix": "vref-typed",
-		"body": [
-			"const ${1:name} = ref<${2:type}>(${3:initialValue})"
-		],
-		"description": "Vue Ref with generic type argument"
-	},
-	"Vue Reactive": {
-		"prefix": "vreactive",
-		"body": [
-			"const ${1:name} = reactive({",
-			"\t${2:count}: ${3:0}",
-			"})"
-		],
-		"description": "Vue reactive"
-	},
-	"Vue Computed": {
-		"prefix": "vcomputed",
-		"body": [
-			"const ${1:name} = computed(() => {",
-			"\treturn ${2}",
-			"})"
-		],
-		"description": "Vue computed"
-	},
-	"Vue Watch": {
-		"prefix": "vwatch",
-		"body": [
-			"watch(",
-			"\t() => ${1:name},",
-			"\t() => {",
-			"\t\t${2}",
-			"\t}",
-			")"
-		],
-		"description": "Vue watcher"
-	},
-	"Vue Watch Effect": {
-		"prefix": "vwatcheffect",
-		"body": [
-			"watchEffect(() => {",
-			"\t${1}",
-			"})"
-		],
-		"description": "Vue Watch Effect"
-	},
-	"Vue Lifecycle Hooks - onMounted": {
-		"prefix": "vonmounted",
-		"body": [
-			"onMounted(() => {",
-			"\t${1}",
-			"})"
-		],
-		"description": "Vue onMounted Lifecycle hook"
-	},
-	"Vue Lifecycle Hooks - onBeforeMount": {
-		"prefix": "vonbeforemount",
-		"body": [
-			"onBeforeMount(() => {",
-			"\t${1}",
-			"})"
-		],
-		"description": "Vue onBeforeMount Lifecycle hook"
-	},
-	"Vue Lifecycle Hooks - onBeforeUpdate": {
-		"prefix": "vonbeforeupdate",
-		"body": [
-			"onBeforeUpdate(() => {",
-			"\t${1}",
-			"})"
-		],
-		"description": "Vue onBeforeUpdate Lifecycle hook"
-	},
-	"Vue Lifecycle Hooks - onUpdated": {
-		"prefix": "vonupdated",
-		"body": [
-			"onUpdated(() => {",
-			"\t${1}",
-			"})"
-		],
-		"description": "Vue onUpdated Lifecycle hook"
-	},
-	"Vue Lifecycle Hooks - onErrorCaptured": {
-		"prefix": "vonerrorcaptured",
-		"body": [
-			"onErrorCaptured(() => {",
-			"\t${1}",
-			"})"
-		],
-		"description": "Vue onErrorCaptured Lifecycle hook"
-	},
-	"Vue Lifecycle Hooks - onUnmounted": {
-		"prefix": "vonunmounted",
-		"body": [
-			"onUnmounted(() => {",
-			"\t${1}",
-			"})"
-		],
-		"description": "Vue onUnmounted Lifecycle hook"
-	},
-	"Vue Lifecycle Hooks - onBeforeUnmount": {
-		"prefix": "vonbeforeunmount",
-		"body": [
-			"onBeforeUnmount(() => {",
-			"\t${1}",
-			"})"
-		],
-		"description": "Vue onBeforeUnmount Lifecycle hook"
-	},
-	"Vue Define Props": {
-		"prefix": "vdefineprops",
-		"body": [
-			"defineProps<{",
-			"\t${1:name}: ${2:type}",
-			"}>()"
-		],
-		"description": "Vue defineProps"
-	},
-	"Vue Define Props with defaults": {
-		"prefix": "vdefineprops-withdefaults",
-		"body": [
-			"withDefaults(defineProps<{",
-			"\t${1:name}: ${2:type}",
-			"}>(), {",
-			"\t${1:name}: ${3:default}",
-			"})"
-		],
-		"description": "Vue withDefaults(defineProps)"
-	},
-	"Vue Define Emits": {
-		"prefix": "vdefineemits",
-		"body": [
-			"const emit = defineEmits<{",
-			"\t${1:eventName}: [${0}]",
-			"}>()"
-		],
-		"description": "Vue defineEmits"
-	},
-	"Vue Single Emit": {
-		"prefix": "vsingleemit",
-		"body": [
-			"${1:eventName}: [${0}]",
-		],
-		"description": "Vue single emit for defineEmits"
-	},
-	"Vue Define Slots": {
-		"prefix": "vdefineslots",
-		"body": [
-			"defineSlots<{",
-			"\tdefault: (props: { ${0} }) => any",
-			"}>()"
-		],
-		"description": "Vue defineSlots"
-	},
-	"Vue Single Slot": {
-		"prefix": "vsingleslot",
-		"body": [
-			"\t${1:slotName}: (props: { ${0} }) => any",
-		],
-		"description": "Vue single slot for defineSlots"
-	},
-	"Vue Define Options": {
-		"prefix": "vdefineoptions",
-		"body": [
-			"defineOptions({",
-			"\t${0}",
-			"})"
-		],
-		"description": "Vue defineOptions"
-	},
-	"Vue Define Model": {
-		"prefix": "vdefinemodel",
-		"body": [
-			"const modelValue = defineModel()",
-		],
-		"description": "Vue defineModel"
-	},
-	"Vue Style Binding Object": {
-		"prefix": "vstyle-obj",
-		"body": [
-			":style=\"[${2:styleObjectA}, ${3:styleObjectB]}\""
-		],
-		"description": "vue inline style binding, objects"
-	},
-	"Vue Class Binding": {
-		"prefix": "vclass",
-		"body": [
-			":class=\"{ '${2:classList}': ${1:condition} }\""
-		],
-		"description": "vue class binding"
-	},
-	"Vue Class Binding Ternary": {
-		"prefix": "vclass-ter",
-		"body": [
-			":class=\"[${1:condition} ? '${2:classListOnTrue}' : '${3:classListOnFalse}']\""
-		],
-		"description": "vue ternary class binding"
-	},
-}
-```
-
-
-# 顶部浮动显示当前层级
-
-
-
-
-
-## 说明
-
-较新版本 VS Code 支持 **粘性滚动**（Sticky Scroll）：在编辑器中向下滚动时，在**顶部**固定显示当前所在的**类/函数/命名空间**层级，便于长文件内定位结构。
-
-```json
-"editor.experimental.stickyScroll.enabled": true
-```
-
-<img alt="AhJindeg-1701076874210" src={__img0} placeholder="blur" />
-
-
-# 紧凑形式呈现文件夹
-
-
-
-
-
-
-
-## 说明
-
-`explorer.compactFolders` 为 `true` 时，资源管理器以**紧凑**方式展示：当文件夹下**只有一个**子文件夹时，会把父子合并成**一层**路径显示。
-
-```json
-"explorer.compactFolders": false
-```
-
-### 开启紧凑（示例）
-
-<img alt="AhJindeg-1701156705523" src={__img0} placeholder="blur" />
-
-### 关闭紧凑（示例）
-
-<img alt="AhJindeg-1701156684507" src={__img1} placeholder="blur" />
-
-
-# 配置 prototype 防止往同一地址跳转时会报错的情况
-
-
-
-## 问题说明
-
-Vue Router 在重复导航到当前路由时，`push` / `replace` 可能 reject，在控制台或拦截器里产生噪音。可在创建路由实例前，对 `VueRouter.prototype` 做一层包装，把「重复导航」类错误消化掉。
-
-## 实现：router / index
-
-```javascript
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-
-Vue.use(VueRouter)
-
-const originalPush = VueRouter.prototype.push
-VueRouter.prototype.push = function push(location, onResolve, onReject) {
-  if (onResolve || onReject)
-    return originalPush.call(this, location, onResolve, onReject)
-  return originalPush.call(this, location).catch((err) => err)
-}
-
-const originalReplace = VueRouter.prototype.replace
-VueRouter.prototype.replace = function replace(location, onResolve, onReject) {
-  if (onResolve || onReject)
-    return originalReplace.call(this, location, onResolve, onReject)
-  return originalReplace.call(this, location).catch((err) => err)
-}
-```
-
-> 注：若使用 **Vue 3** + `createRouter`，更推荐在应用侧用 **导航守卫** 或 `router` 的 `isReady()`、全局错误处理；以上为 **Vue 2** 下常见改法。
-
-
-# 状态管理速查（ref 与 reactive）
-
-
-
-
-
-## 内容说明
-
-速查图对比 `ref()` 与 `reactive()`：声明方式、`.value` 解包、以及 `reactive` 的解构与整体替换等限制。Vue 推荐以 **`ref` 作为声明响应式状态的主要方式**。
-
-## 速查图
-
-<img alt="Vue.js 3 State Management：ref 与 reactive 对比速查" src={__img0} placeholder="blur" />
-
-*图源：@icarus\_gk*
-
-
-# 样式穿透
-
-
-
-## 问题说明
-
-使用 Vue 3 时，因 CSS 预处理器不同，`/deep/`、`::v-deep`、`>>>` 等可能失效或报警，可改用组合式 API 推荐的伪类选择器。
-
-## 推荐写法
-
-* **子组件/深层选择器**：使用 `:deep(.className)`。
-* **全局样式**：使用 `:global(.className)`。
-* **插槽内容样式**：使用 `:slotted(.className)`。
