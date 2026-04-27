@@ -1,6 +1,6 @@
 {
   "title": "Snippet Box",
-  "description": "A personal collection of code snippets that help me quickly reuse common functions, configurations, and patterns, making it easier to boost my development productivity.",
+  "description": "Personal snippets for quick reuse—functions, configs, and patterns.",
   "root": true,
   "pages": [
     "---Shell---",

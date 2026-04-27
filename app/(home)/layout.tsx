@@ -25,17 +25,6 @@ export default function Layout({ children }: LayoutProps<'/'>) {
             </NavbarMenu>
           ),
         },
-        {
-          type: 'custom',
-          on: 'nav',
-          children: (
-            <NavbarMenu>
-              <NavbarMenuTrigger>
-                <Link href="/ai-engineering">AI Engineering</Link>
-              </NavbarMenuTrigger>
-            </NavbarMenu>
-          ),
-        },
         ...linkItems,
       ]}
       className="[--color-fd-muted-foreground:var(--color-neutral-950)] dark:[--color-fd-muted-foreground:var(--color-slate-100)] dark:bg-neutral-950 dark:[--color-fd-background:var(--color-neutral-950)] [--color-fd-primary:var(--color-brand)]"

@@ -3,8 +3,8 @@ import {
   BookOpen,
   Code2,
   FileCode2,
-  LayoutPanelLeft,
   Package,
+  Bot,
   type LucideIcon,
 } from 'lucide-react';
 import { firstPageUrlInFolder } from '@/lib/page-tree-nav';
@@ -21,15 +21,14 @@ export function getModulePathSegment(href: string): string {
  */
 export function getModuleLucideIcon(segment: string): LucideIcon {
   switch (segment) {
-    case 'vue':
+    case 'front-end':
       return Code2;
-    case 'JS_TS':
-    case 'js_ts':
-      return FileCode2;
-    case 'vscode_cursor':
-      return LayoutPanelLeft;
     case 'snippet-box':
       return Package;
+    case 'ai-engineering':
+      return Bot;
+    case 'xxx':
+      return FileCode2;
     default:
       return BookOpen;
   }

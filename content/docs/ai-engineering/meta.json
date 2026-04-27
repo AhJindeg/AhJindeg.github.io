@@ -1,6 +1,6 @@
 {
   "title": "AI Engineering",
-  "icon": "Bot",
+  "description": "Reliable AI delivery—foundations, agent workflows, reusable skills, and evaluation.",
   "root": true,
   "pages": [
     "index",

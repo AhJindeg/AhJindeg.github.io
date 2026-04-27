@@ -1,0 +1,15 @@
+{
+  "title": "Front-end",
+  "description": "There is a lot to know as a web developer, and you are constantly learning.",
+  "root": true,
+  "pages": [
+    "---Declare---",
+    "...declare",
+    "---JSON---",
+    "...json",
+    "---Vue Router---",
+    "...vue-router",
+    "---Vue 3---",
+    "...vue3"
+  ]
+}
