@@ -4,10 +4,6 @@
   "root": true,
   "pages": [
     "---Shell---",
-    "...shell",
-    "---Yudao UI---",
-    "yudao-ui/page",
-    "yudao-ui/form",
-    "...yudao-ui"
+    "...shell"
   ]
 }
