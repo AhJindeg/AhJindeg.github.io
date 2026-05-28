@@ -1,0 +1,389 @@
+---
+title: 编辑弹窗表单
+description: Yudao UI 编辑弹窗表单 代码片段
+---
+
+## 默认弹窗表单
+
+### 引用组件
+
+```vue
+<script lang="ts">
+import XxxForm from './form.vue'
+</script>
+
+<script lang="ts" setup>
+/** 添加/修改/详情表单 */
+const formRef = ref()
+/**
+ * 添加/修改/详情按钮操作
+ * @author AhJindeg <AhJindeg@gmail.com>
+ **/
+async function openForm(type: string, id?: number) {
+  formRef.value.open(type, id)
+}
+</script>
+
+<template>
+  <el-button
+    type="primary"
+    @click="openForm('create')"
+    v-hasPermi="['ledger:gateway:create']"
+  >
+    <Icon icon="ep:plus" class="mr-5px" />{{ t('common.create') }}
+  </el-button>
+
+  <el-button
+    link
+    type="primary"
+    @click="openForm('detail', row.id)"
+    v-hasPermi="['ledger:gateway:detail']"
+  >
+    {{ t('common.detail') }}
+  </el-button>
+  <el-button
+    link
+    type="primary"
+    @click="openForm('update', row.id)"
+    v-hasPermi="['ledger:gateway:update']"
+  >
+    {{ t('common.update') }}
+  </el-button>
+
+  <XxxForm ref="formRef" @success="getList" />
+</template>
+```
+
+
+### 表单结构
+
+```vue
+<script lang="ts">
+import { cloneDeep } from 'lodash-es'
+import { FormTitle } from '@/components/Title'
+import * as Api from '../services/api'
+import * as Types from '../services/types'
+
+/** 初始化表单数据 */
+const INIT_FORM_DATA: Types.Xxx = {
+}
+</script>
+
+<script lang="ts" setup>
+const emit = defineEmits(['success'])
+
+/** 国际化 */
+const { t } = useI18n()
+/** 消息弹窗 */
+const message = useMessage()
+
+/** 表单 Ref */
+const formRef = ref()
+/** 表单校验规则 */
+const formRules = reactive({
+  x: [
+    {
+      required: true,
+      message: t('common.formRulesMessage', { text: t('x.x.x') })
+    }
+  ],
+})
+
+/** 表单的类型：create - 新增；update - 修改；detail - 详情 copy-复制 */
+const formType = ref('')
+/** 弹窗的标题 */
+const dialogTitle = ref('')
+/**
+ * 更新弹窗的标题
+ * @author AhJindeg <AhJindeg@gmail.com>
+ **/
+function updatedDialogTitle(type: string) {
+  formType.value = type
+  dialogTitle.value = t('action.' + type)
+}
+/** 判断当前操作状态是否为详情 */
+const isDetail = computed((): boolean => formType.value === 'detail')
+/** 判断当前操作状态是否为新增 */
+const isCreate = computed((): boolean => formType.value === 'create')
+
+/** 弹窗的是否展示 */
+const dialogVisible = ref(false)
+/** 表单的加载中：1）修改时的数据加载；2）提交的按钮禁用 */
+const formLoading = ref(false)
+/** 表单数据 */
+const formData = ref<Types.Xxx>(cloneDeep(INIT_FORM_DATA))
+/**
+ * 打开弹窗
+ * @author AhJindeg <AhJindeg@gmail.com>
+ **/
+async function open(type: string, id?: number) {
+  dialogVisible.value = true
+  updatedDialogTitle(type)
+  resetForm()
+  formLoading.value = true
+  // 修改时，设置数据
+  if (id) {
+    formData.value = await Api.getXxx(id).catch(() => cloneDeep(INIT_FORM_DATA))
+  }
+  formLoading.value = false
+}
+
+/**
+ * 提交表单
+ * @author AhJindeg <AhJindeg@gmail.com>
+ **/
+async function submitForm() {
+  // 校验表单
+  if (!formRef) return
+  const valid = await formRef.value.validate()
+  if (!valid) return
+  // 提交请求
+  formLoading.value = true
+  try {
+    const data = { ...formData.value }
+    if (formType.value === 'create') {
+      await Api.createXxx(data)
+      message.success(t('common.createSuccess'))
+    } else {
+      await Api.updateXxx(data)
+      message.success(t('common.updateSuccess'))
+    }
+    dialogVisible.value = false
+    // 发送操作成功的事件
+    emit('success')
+  } finally {
+    formLoading.value = false
+  }
+}
+
+/**
+ * 重置表单
+ * @author AhJindeg <AhJindeg@gmail.com>
+ **/
+function resetForm() {
+  formData.value = cloneDeep(INIT_FORM_DATA)
+  formRef.value?.resetFields()
+}
+
+defineExpose({ open })
+</script>
+
+<template>
+  <Dialog v-model="dialogVisible" :title="dialogTitle" width="1200">
+    <el-form
+      ref="formRef"
+      v-loading="formLoading"
+      :model="formData"
+      :rules="formRules"
+      label-width="120px"
+      :disabled="isDetail"
+    >
+      <el-row>
+        <el-col :span="24">
+          <FormTitle :title="t('common.baseFormTitle')" />
+        </el-col>
+      </el-row>
+    </el-form>
+    <template #footer>
+      <el-button v-if="!isDetail" :disabled="formLoading" type="primary" @click="submitForm">
+        {{ t('common.dialogSubmit') }}
+      </el-button>
+      <el-button @click="dialogVisible = false">{{ t('common.dialogCancel') }}</el-button>
+    </template>
+  </Dialog>
+</template>
+```
+
+## 详情页
+
+### 路由配置
+
+```typescript
+{
+    path: '/x-x-x',
+    component: Layout,
+    name: 'XxXxXxView',
+    meta: {
+        hidden: true
+    },
+    children: [
+        {
+        path: 'x-x-x/form/:id',
+        component: () => import('@/views/x/x/x/view/edit/index.vue'),
+        name: 'XxXxXxEdit',
+        meta: {
+            noCache: true,
+            hidden: true,
+            canTo: true,
+            title: 'x-x-x',
+            activeMenu: 'x-x-x/x-x-x/edit'
+        }
+        }
+    ]
+},
+```
+
+### 跳转路由
+
+```typescript
+/** 路由对象 */
+const router = useRouter()
+/**
+ * 打开x-x-x编辑
+ * @author AhJindeg <AhJindeg@gmail.com>
+ **/
+async function openEditForm(stationId: string) {
+  await nextTick()
+  router.push({
+    name: 'XxXxEdit',
+    params: { stationId },
+    query: { fallback: 'XxXx' }
+  })
+}
+```
+
+### 详情页结构
+
+```vue
+<script lang="ts">
+import { cloneDeep } from 'lodash-es'
+import { FormTitle } from '@/components/Title'
+import * as Api from '../../services/api'
+import type * as Types from '../../services/types.d'
+
+/** 初始化表单数据 */
+const INIT_FORM_DATA: Types.Xxx = {
+}
+</script>
+
+<script lang="ts" setup>
+/** 消息弹窗 */
+const message = useMessage()
+/** 国际化 */
+const { t } = useI18n()
+
+/** 路由对象 */
+const router = useRouter()
+/**
+ * 跳转x-x-x
+ * @author AhJindeg <AhJindeg@gmail.com>
+ **/
+function goXxXx() {
+  router.push({ name: routeQuery.value.fallback ?? 'XxXx' })
+}
+
+/** 表单标题 */
+const formTitle = ref('')
+/** 表单的类型：create - 新增；update - 修改；detail - 详情 */
+const formType = ref('')
+/** 判断当前操作状态是否为详情 */
+const isDetail = computed((): boolean => formType.value === 'detail')
+/**
+ * 更新标题
+ * @author AhJindeg <AhJindeg@gmail.com>
+ **/
+function updatedTitle(type: string) {
+  formType.value = type ?? 'detail'
+  formTitle.value = `${t('x.x.x')}${type ? t('action.' + type) : ''}`
+}
+
+/** 表单 Ref */
+const formRef = ref()
+/** 表单的加载中：1）修改时的数据加载；2）提交的按钮禁用 */
+const formLoading = ref(false)
+/** 表单数据 */
+const formData = ref<Types.Xxx>(cloneDeep(INIT_FORM_DATA))
+/**
+ * 获取x-x-x
+ * @author AhJindeg <AhJindeg@gmail.com>
+ **/
+async function getXxXx() {
+  resetForm()
+  formData.value = await Api.getXxx<Types.Xxx>(
+    routeQuery.value.id as number
+  ).catch(() => cloneDeep(INIT_FORM_DATA))
+}
+
+/**
+ * 重置表单
+ * @author AhJindeg <AhJindeg@gmail.com>
+ **/
+function resetForm() {
+  formData.value = cloneDeep(INIT_FORM_DATA)
+  formRef.value?.resetFields()
+}
+
+/**
+ * 提交表单
+ * @author AhJindeg <AhJindeg@gmail.com>
+ **/
+async function submitForm() {
+  const data = await strategySeasonRef.value?.getFormData()
+  if (!data) return
+  await message.customConfirm(
+    t('common.defaultConfirm', {
+      name: t('x.x.x.save')
+    })
+  )
+  formLoading.value = true
+  try {
+    await Api.saveXxx({
+      strategyId: routeQuery.value.id as number,
+      seasonList: data
+    })
+    message.success(t('x.x.x.saveSuccess'))
+    goXxXx()
+  } finally {
+    formLoading.value = false
+  }
+}
+
+/**
+ * 返回x-x-x
+ * @author AhJindeg <AhJindeg@gmail.com>
+ **/
+async function backXxXx() {
+  if (!isDetail.value) {
+    await message.customConfirm(t('common.backPageConfirm'))
+  }
+  goXxXx()
+}
+
+/** 表单id */
+const routeQuery = ref<{ stationId: string; fallback: string }>({
+  stationId: '',
+  fallback: ''
+})
+onMounted(async () => {
+  const { query, params } = useRoute()
+  if (isNil(params.stationId)) {
+    goXxXx()
+    return
+  }
+  routeQuery.value = {
+    stationId: params.stationId as string,
+    fallback: query.fallback as string
+  }
+  await nextTick()
+  getXxXx()
+})
+</script>
+
+<template>
+  <ContentWrap>
+    <el-page-header @back="backPeriodicStrategyBase">
+      <template #content>
+        <div class="font-bold">{{ formTitle }}</div>
+      </template>
+      <template #extra>
+        <el-button v-if="!isDetail" :disabled="formLoading" type="primary" @click="submitForm">
+          {{ t('sesops.periodicStrategy.base.saveStrategy') }}
+        </el-button>
+      </template>
+    </el-page-header>
+    <el-divider class="!my-15px" />
+    <el-form ref="formRef" v-loading="formLoading" :model="formData" label-width="130px" disabled="isDetail">
+    </el-form>
+  </ContentWrap>
+</template>
+```

@@ -6,6 +6,8 @@
     "---Shell---",
     "...shell",
     "---Yudao UI---",
+    "yudao-ui/page",
+    "yudao-ui/form",
     "...yudao-ui"
   ]
 }
