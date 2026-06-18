@@ -535,6 +535,74 @@ RAG 本质是把“生成问题”拆成“检索问题 + 生成问题”。\
 * “离线分数很好，线上投诉高”：评测集与真实流量脱节。
 
 
+# 给 Window 增加自定义属性声明
+
+
+
+## 简单声明
+
+在独立声明文件中扩展 `Window`，注意该文件内不要写 `import`，否则会变成模块、可能无法作为全局 augment 使用（见下一节做法）。
+
+创建 `xxx.d.ts`，用 `declare` 补全类型。**注意：此文件内不要使用 `import` / `export`，否则会被视为模块，全局 `Window` 扩展可能不生效。**
+
+```typescript
+<env.d.ts>
+
+/// <reference types="vite/client" />
+
+declare module '*.vue' {
+  import { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}
+
+declare interface Window {
+  canvas: {
+    e: boolean[],
+    x: number,
+    y: string
+  }
+}
+```
+
+## 复杂声明：命名空间与可 import 的类型
+
+若需在 `Window` 上挂载**来自其他模块**的类型，单独一个无 `import` 的全局 `.d.ts` 往往不够；可先建命名空间文件，再在另一份 `env.d.ts` 里合并到 `Window`。
+
+流程概览：新建 `window.d.ts`（namespace + 可 `import`）→ 在仅 `declare` 的 `env.d.ts` 里引用该命名空间类型。
+
+```typescript
+<window.d.ts>
+
+import { CanvasPlus, Canvas } from '@/declare'
+
+declare namespace WindowCanvas {
+  interface CanvasInterface extends Canvas {
+    canvas: CanvasPlus
+  }
+}
+
+export = WindowCanvas
+export as namespace WindowCanvas
+```
+
+```typescript
+<env.d.ts>
+
+/// <reference types="vite/client" />
+
+declare module '*.vue' {
+  import { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}
+
+declare interface Window {
+  windowCanvas: WindowCanvas.CanvasInterface
+}
+```
+
+
 # 序列化与反序列化
 
 
@@ -1067,72 +1135,4 @@ ipconfig /flushdns
 
 ```powershell
 ipconfig /renew
-```
-
-
-# 给 Window 增加自定义属性声明
-
-
-
-## 简单声明
-
-在独立声明文件中扩展 `Window`，注意该文件内不要写 `import`，否则会变成模块、可能无法作为全局 augment 使用（见下一节做法）。
-
-创建 `xxx.d.ts`，用 `declare` 补全类型。**注意：此文件内不要使用 `import` / `export`，否则会被视为模块，全局 `Window` 扩展可能不生效。**
-
-```typescript
-<env.d.ts>
-
-/// <reference types="vite/client" />
-
-declare module '*.vue' {
-  import { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
-  export default component
-}
-
-declare interface Window {
-  canvas: {
-    e: boolean[],
-    x: number,
-    y: string
-  }
-}
-```
-
-## 复杂声明：命名空间与可 import 的类型
-
-若需在 `Window` 上挂载**来自其他模块**的类型，单独一个无 `import` 的全局 `.d.ts` 往往不够；可先建命名空间文件，再在另一份 `env.d.ts` 里合并到 `Window`。
-
-流程概览：新建 `window.d.ts`（namespace + 可 `import`）→ 在仅 `declare` 的 `env.d.ts` 里引用该命名空间类型。
-
-```typescript
-<window.d.ts>
-
-import { CanvasPlus, Canvas } from '@/declare'
-
-declare namespace WindowCanvas {
-  interface CanvasInterface extends Canvas {
-    canvas: CanvasPlus
-  }
-}
-
-export = WindowCanvas
-export as namespace WindowCanvas
-```
-
-```typescript
-<env.d.ts>
-
-/// <reference types="vite/client" />
-
-declare module '*.vue' {
-  import { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
-  export default component
-}
-
-declare interface Window {
-  windowCanvas: WindowCanvas.CanvasInterface
-}
 ```
