@@ -3,6 +3,7 @@ import { baseOptions, linkItems } from '@/lib/layout.shared';
 import { NavbarMenu, NavbarMenuTrigger } from 'fumadocs-ui/layouts/home/navbar';
 import Link from 'fumadocs-core/link';
 import { DocsNavbarMenu } from './docs-navbar-menu';
+import { LinkNavbarMenu } from './link-navbar-menu';
 
 export default function Layout({ children }: LayoutProps<'/'>) {
   return (
@@ -24,6 +25,11 @@ export default function Layout({ children }: LayoutProps<'/'>) {
               </NavbarMenuTrigger>
             </NavbarMenu>
           ),
+        },
+        {
+          type: 'custom',
+          on: 'nav',
+          children: <LinkNavbarMenu />,
         },
         ...linkItems,
       ]}

@@ -5,7 +5,7 @@ import {
   NavbarMenuLink,
   NavbarMenuTrigger,
 } from 'fumadocs-ui/layouts/home/navbar';
-import MenuLinkIcon from '@/public/menu-link-icon.png';
+import DocsNavbarMenuIcon from '@/public/docs-navbar-menu-icon.png';
 import { getNavbarModules } from '@/lib/navbar-modules';
 import { getModuleLucideIconForHref } from '@/lib/module-icons';
 
@@ -31,7 +31,7 @@ export function DocsNavbarMenu() {
         <NavbarMenuLink href="/docs" className="md:row-span-2">
           <div className="-mx-3 -mt-3">
             <Image
-              src={MenuLinkIcon}
+              src={DocsNavbarMenuIcon}
               alt="Docs"
               className="rounded-t-lg object-cover"
               style={{
