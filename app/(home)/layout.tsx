@@ -1,8 +1,6 @@
 import { HomeLayout } from 'fumadocs-ui/layouts/home';
 import { baseOptions, linkItems } from '@/lib/layout.shared';
 import { getHomeMobileNavItems } from '@/lib/home-mobile-nav-items';
-import { NavbarMenu, NavbarMenuTrigger } from 'fumadocs-ui/layouts/home/navbar';
-import Link from 'fumadocs-core/link';
 import { DocsNavbarMenu } from './docs-navbar-menu';
 import { LinkNavbarMenu } from './link-navbar-menu';
 
@@ -17,15 +15,11 @@ export default function Layout({ children }: LayoutProps<'/'>) {
           children: <DocsNavbarMenu />,
         },
         {
-          type: 'custom',
+          type: 'main',
           on: 'nav',
-          children: (
-            <NavbarMenu>
-              <NavbarMenuTrigger>
-                <Link href="/blog">Blog</Link>
-              </NavbarMenuTrigger>
-            </NavbarMenu>
-          ),
+          text: 'Blog',
+          url: '/blog',
+          active: 'nested-url',
         },
         {
           type: 'custom',

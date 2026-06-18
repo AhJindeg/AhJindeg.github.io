@@ -3,11 +3,11 @@ import {
   NavbarMenu,
   NavbarMenuContent,
   NavbarMenuLink,
-  NavbarMenuTrigger,
 } from 'fumadocs-ui/layouts/home/navbar';
 import DocsNavbarMenuIcon from '@/public/docs-navbar-menu-icon.png';
 import { getNavbarModules } from '@/lib/navbar-modules';
 import { getModuleLucideIconForHref } from '@/lib/module-icons';
+import { NavbarMenuTriggerButton } from './navbar-menu-trigger';
 
 /** 大屏三列网格下，右侧 2×2 单元格的定位（与 Fumadocs 文档示例一致） */
 const MODULE_GRID_POSITIONS = [
@@ -25,7 +25,7 @@ export function DocsNavbarMenu() {
 
   return (
     <NavbarMenu>
-      <NavbarMenuTrigger>Documentation</NavbarMenuTrigger>
+      <NavbarMenuTriggerButton>Documentation</NavbarMenuTriggerButton>
       <NavbarMenuContent className="grid w-[min(92vw,44rem)] gap-2 p-2 sm:w-auto md:grid-cols-2 lg:grid-cols-3 lg:grid-rows-2 lg:gap-3">
         {/* 文档总览：对应 content/docs/index.mdx */}
         <NavbarMenuLink href="/docs" className="md:row-span-2">
